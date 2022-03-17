@@ -1,10 +1,6 @@
 name: 'Hello World'
 description: 'Greet someone and record the time'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
   file-path:
     description: 'Path to the file'
     required: true

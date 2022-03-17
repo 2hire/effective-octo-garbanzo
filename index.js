@@ -18,19 +18,8 @@ const getData = async (branchName, token) => {
   }
 };
 
-const printData = async (branchName, token) => {
-  const data = await getData(branchName, token);
-
-  console.log(data.data);
-};
-
 try {
-  // `who-to-greet` input defined in action metadata file
-  const nameToGreet = core.getInput("who-to-greet");
-  console.log(`Hello ${nameToGreet}!`);
-
   const path = core.getInput("file-path");
-  console.log(`File path: ${path}`);
   fs.readFile(path, "utf-8", (error, data) => {
     if (error) {
       return console.log(error);
@@ -44,7 +33,7 @@ try {
   const appInfo = JSON.parse(core.getInput("app-info"));
 
   appInfo.forEach((element) => {
-    printData(element.branchName, githubToken);
+    getData(element.branchName, githubToken).then((response) => console.log(response.data));
   });
 
   const time = new Date().toTimeString();
