@@ -11,6 +11,9 @@ inputs:
   app-info:
     description: 'Apps list'
     required: true
+  github-token:
+    description: 'Github token'
+    required: true
 outputs:
   time: # id of output
     description: 'The time we greeted you'

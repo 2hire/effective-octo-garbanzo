@@ -3,18 +3,20 @@ const github = require("@actions/github");
 const axios = require("axios");
 const fs = require("fs");
 
-const getData = async () => {
+const getData = async (branchName, token) => {
   try {
-    return await axios.get("https://dog.ceo/api/breeds/list/all");
+    return await axios.get(
+      `https://raw.githubusercontent.com/2hire/${branchName}/settings/translations.json?token=${token}`
+    );
   } catch (error) {
     console.error(error);
   }
 };
 
-const printData = async () => {
-  const data = await getData();
+const printData = async (branchName, token) => {
+  const data = await getData(branchName, token);
 
-  console.log(data.data.message);
+  console.log(data);
 };
 
 try {
@@ -24,19 +26,21 @@ try {
 
   const path = core.getInput("file-path");
   console.log(`File path: ${path}`);
-  fs.readFile(path, 'utf-8', (error, data) => {
+  fs.readFile(path, "utf-8", (error, data) => {
     if (error) {
       return console.log(error);
     }
-    
+
     console.log(data);
-  })
-  
-  const isPresent = core.getInput("app-info");
+  });
 
-  if (isPresent) console.log('We got data!');
+  const githubToken = core.getInput("github-token");
 
-  printData();
+  const appInfo = core.getInput("app-info");
+
+  appInfo.forEach((element) => {
+    printData(element.branchName, githubToken);
+  });
 
   const time = new Date().toTimeString();
   core.setOutput("time", time);
