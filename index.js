@@ -79,28 +79,31 @@ const updateKeys = (source, target) => {
 };
 
 try {
-  print('Getting inputs from action', MessageType.INFO);
+  print("Getting inputs from action", MessageType.INFO);
   // Getting inputs from action
   const path = core.getInput("file-path");
   const githubToken = core.getInput("github-token");
   const appInfo = JSON.parse(core.getInput("app-info"));
 
-  print('Reading file from the given path', MessageType.INFO);
+  print("Reading file from the given path", MessageType.INFO);
   // Read file from path
   fs.readFile(path, "utf-8", (error, data) => {
     if (error) {
       return print(error, MessageType.ERROR);
     }
 
-    print('Read successful', MessageType.SUCCESS);
+    print("Read successful", MessageType.SUCCESS);
 
     appInfo.forEach((element) => {
-      print(`Fetching translations from ${element.branchName}...`, MessageType.INFO);
+      print(
+        `Fetching translations from ${element.branchName}...`,
+        MessageType.INFO
+      );
 
       getData(element.branchName, githubToken).then((response) => {
         // Updating keys
-        print('Fetch successful', MessageType.SUCCESS);
-        print('Updating keys...', MessageType.INFO);
+        print("Fetch successful", MessageType.SUCCESS);
+        print("Updating keys...", MessageType.INFO);
         updateKeys(data.base, response.base);
         print(`develop: ${data}`);
         print(`${element.branchName} now: ${response}`);
