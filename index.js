@@ -70,7 +70,7 @@ try {
         console.log("Updating keys...");
         updateKeys(data.base, response.base);
         console.log(`develop: ${data}`);
-        console.log(`${element.branchName} now: ${response}`);
+        console.log(`${element.branchName} now: ${JSON.stringify(response)}`);
       });
     });
   });
