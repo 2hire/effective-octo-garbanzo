@@ -1,21 +1,27 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
+const axios = require('axios');
 
-// const getData = async () => {
-//   const response = await fetch("https://api.github.com/users/github");
-//   const data = await response.json();
+const getData = async () => {
+  try {
+    return await axios.get('https://dog.ceo/api/breeds/list/all')
+  } catch (error) {
+    console.error(error)
+  }
+}
 
-//   console.log(data);
+const printData = async () => {
+  const data = await getData();
 
-//   return data;
-// }
+  console.log(data);
+}
 
 try {
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = core.getInput("who-to-greet");
   console.log(`Hello ${nameToGreet}!`);
 
-  // getData().then((data) => console.log(data, ' outer function'));
+  printData();
 
   const time = new Date().toTimeString();
   core.setOutput("time", time);
