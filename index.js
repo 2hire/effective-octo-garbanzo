@@ -38,9 +38,7 @@ try {
 
   const appInfo = core.getInput("app-info");
 
-  appInfo.forEach((element) => {
-    printData(element.branchName, githubToken);
-  });
+  appInfo.length;
 
   const time = new Date().toTimeString();
   core.setOutput("time", time);
