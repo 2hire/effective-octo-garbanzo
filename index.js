@@ -18,16 +18,16 @@ const MessageType = {
 const print = (message, type) => {
   switch (type) {
     case MessageType.SUCCESS:
-      console.log(`\033[1;32m${message}\033[0m`);
+      console.log("\033[1;32m" + message + "\033[0m");
       break;
     case MessageType.INFO:
-      console.log(`\033[2m${message}\033[0m`);
+      console.log("\033[2m" + message + "\033[0m");
       break;
     case MessageType.ERROR:
-      console.log(`\033[5;1;30;41m${message}\033[0m`);
+      console.log("\033[5;1;30;41m" + message + "\033[0m");
       break;
     case MessageType.WARNING:
-      core.ing(`\033[2m${message}\033[0m`);
+      core.ing("\033[2m" + message + "\033[0m");
       break;
     default:
       console.log(message);
