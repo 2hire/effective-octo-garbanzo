@@ -21,7 +21,7 @@ const getData = async (branchName, token) => {
 const printData = async (branchName, token) => {
   const data = await getData(branchName, token);
 
-  console.log(data);
+  console.log(data.data);
 };
 
 try {
