@@ -28,9 +28,13 @@ try {
     if (error) {
       return console.log(error);
     }
-
+    
     console.log(data);
   })
+  
+  const isPresent = core.getInput("app-info");
+
+  if (isPresent) console.log('We got data!');
 
   printData();
 

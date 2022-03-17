@@ -7,7 +7,10 @@ inputs:
     default: 'World'
   file-path:
     description: 'Path to the file'
-    require: true
+    required: true
+  app-info:
+    description: 'Apps list'
+    required: true
 outputs:
   time: # id of output
     description: 'The time we greeted you'
