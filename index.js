@@ -1,25 +1,36 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
-const axios = require('axios');
+const axios = require("axios");
+const fs = require("fs");
 
 const getData = async () => {
   try {
-    return await axios.get('https://dog.ceo/api/breeds/list/all')
+    return await axios.get("https://dog.ceo/api/breeds/list/all");
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-}
+};
 
 const printData = async () => {
   const data = await getData();
 
   console.log(data);
-}
+};
 
 try {
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = core.getInput("who-to-greet");
   console.log(`Hello ${nameToGreet}!`);
+
+  const path = core.getInput("file-path");
+  console.log(`File path: ${path}`);
+  fs.readFile(path, 'utf-8', (error, data) => {
+    if (error) {
+      return console.log(error);
+    }
+
+    console.log(data);
+  })
 
   printData();
 
