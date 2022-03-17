@@ -42,16 +42,14 @@ const print = (message, type) => {
  */
 const getData = async (branchName, token) => {
   try {
-    return await axios
-      .get(
-        `https://raw.githubusercontent.com/Khalester/TestGithubActions/${branchName}/settings/translations.json`,
-        {
-          headers: {
-            Authorization: `token ${token}`,
-          },
-        }
-      )
-      .json();
+    return await axios.get(
+      `https://raw.githubusercontent.com/Khalester/TestGithubActions/${branchName}/settings/translations.json`,
+      {
+        headers: {
+          Authorization: `token ${token}`,
+        },
+      }
+    );
   } catch (error) {
     console.error(error);
   }
