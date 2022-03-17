@@ -61,18 +61,20 @@ try {
 
     console.log("Read successful");
 
+    const source = JSON.parse(data);
+
     appInfo.forEach((element) => {
       console.log(`Fetching translations from ${element.branchName}...`);
 
       getData(element.branchName, githubToken).then((response) => {
-        const fetchedData = response.data;
-        console.log(`Fetched data: ${fetchedData.base}`);
+        const target = response.data;
+        console.log(`Fetched data: ${JSON.stringify(target)}`);
         // Updating keys
         console.log("Fetch successful");
         console.log("Updating keys...");
-        updateKeys(data.base, fetchedData.base);
-        console.log(`develop: ${data}`);
-        console.log(`${element.branchName} now: ${fetchedData}`);
+        updateKeys(source.base, target.base);
+        console.log(`develop: ${JSON.stringify(source)}`);
+        console.log(`${element.branchName} now: ${JSON.stringify(target)}`);
       });
     });
   });
