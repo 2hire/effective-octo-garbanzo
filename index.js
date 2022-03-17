@@ -65,12 +65,13 @@ try {
       console.log(`Fetching translations from ${element.branchName}...`);
 
       getData(element.branchName, githubToken).then((response) => {
+        console.log(response);
         // Updating keys
         console.log("Fetch successful");
         console.log("Updating keys...");
         updateKeys(data.base, response.base);
         console.log(`develop: ${data}`);
-        console.log(`${element.branchName} now: ${JSON.stringify(response)}`);
+        console.log(`${element.branchName} now: ${response}`);
       });
     });
   });
