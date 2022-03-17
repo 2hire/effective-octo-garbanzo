@@ -3,37 +3,6 @@ const github = require("@actions/github");
 const axios = require("axios");
 const fs = require("fs");
 
-const MessageType = {
-  SUCCESS: "success",
-  INFO: "info",
-  ERROR: "error",
-  WARNING: "warning",
-};
-
-/**
- * Given a message and a type, prints coloured text based on type.
- * @param {string} message - The message to be printed.
- * @param {MessageType} type - The type of the message.
- */
-const print = (message, type) => {
-  switch (type) {
-    case MessageType.SUCCESS:
-      console.log("\033[1;32m" + message + "\033[0m");
-      break;
-    case MessageType.INFO:
-      console.log("\033[2m" + message + "\033[0m");
-      break;
-    case MessageType.ERROR:
-      console.log("\033[5;1;30;41m" + message + "\033[0m");
-      break;
-    case MessageType.WARNING:
-      core.ing("\033[2m" + message + "\033[0m");
-      break;
-    default:
-      console.log(message);
-  }
-};
-
 /**
  * Given a branch name and a token, fetches the translations from the given branch.
  * @param {string} branchName - The branch name to get data from.
@@ -77,34 +46,31 @@ const updateKeys = (source, target) => {
 };
 
 try {
-  print("Getting inputs from action", MessageType.INFO);
+  console.log("Getting inputs from action");
   // Getting inputs from action
   const path = core.getInput("file-path");
   const githubToken = core.getInput("github-token");
   const appInfo = JSON.parse(core.getInput("app-info"));
 
-  print("Reading file from the given path", MessageType.INFO);
+  console.log("Reading file from the given path");
   // Read file from path
   fs.readFile(path, "utf-8", (error, data) => {
     if (error) {
-      return print(error, MessageType.ERROR);
+      return console.error(error);
     }
 
-    print("Read successful", MessageType.SUCCESS);
+    console.log("Read successful");
 
     appInfo.forEach((element) => {
-      print(
-        `Fetching translations from ${element.branchName}...`,
-        MessageType.INFO
-      );
+      console.log(`Fetching translations from ${element.branchName}...`);
 
       getData(element.branchName, githubToken).then((response) => {
         // Updating keys
-        print("Fetch successful", MessageType.SUCCESS);
-        print("Updating keys...", MessageType.INFO);
+        console.log("Fetch successful");
+        console.log("Updating keys...");
         updateKeys(data.base, response.base);
-        print(`develop: ${data}`);
-        print(`${element.branchName} now: ${response}`);
+        console.log(`develop: ${data}`);
+        console.log(`${element.branchName} now: ${response}`);
       });
     });
   });
