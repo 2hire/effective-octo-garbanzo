@@ -6,7 +6,7 @@ const fs = require("fs");
 const getData = async (branchName, token) => {
   try {
     return await axios.get(
-      `https://raw.githubusercontent.com/Khalester/TestGithubActions/${branchName}/settings/translations.json?token=${token}`
+      `https://raw.githubusercontent.com/Khalester/TestGithubActions/tree/${branchName}/settings/translations.json?token=${token}`
     );
   } catch (error) {
     console.error(error);
