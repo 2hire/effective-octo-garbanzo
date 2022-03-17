@@ -32,8 +32,8 @@ const getData = async (branchName, token) => {
 const updateKeys = (source, target) => {
   if (
     typeof source === "object" &&
-    !Array.isArray(yourVariable) &&
-    yourVariable !== null
+    !Array.isArray(source) &&
+    source !== null
   ) {
     const sourceKeys = Object.keys(source);
     sourceKeys.forEach((key) => {
