@@ -66,7 +66,7 @@ try {
 
       getData(element.branchName, githubToken).then((response) => {
         const fetchedData = response.data;
-        console.log(`Fetched data: ${fetchedData}`);
+        console.log(`Fetched data: ${fetchedData.base}`);
         // Updating keys
         console.log("Fetch successful");
         console.log("Updating keys...");
