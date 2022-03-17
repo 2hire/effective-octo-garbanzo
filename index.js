@@ -14,7 +14,7 @@ const getData = async () => {
 const printData = async () => {
   const data = await getData();
 
-  console.log(data);
+  console.log(data.data.message);
 };
 
 try {
