@@ -2,15 +2,21 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const fetch = require("node-fetch");
 
+const getData = async () => {
+  const response = await fetch("https://api.github.com/users/github");
+  const data = await response.json();
+
+  console.log(data);
+
+  return data;
+}
+
 try {
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = core.getInput("who-to-greet");
   console.log(`Hello ${nameToGreet}!`);
 
-  const response = await fetch("https://api.github.com/users/github");
-  const data = await response.json();
-
-  console.log(data);
+  getData().then((data) => console.log(data, ' outer function'));
 
   const time = new Date().toTimeString();
   core.setOutput("time", time);
