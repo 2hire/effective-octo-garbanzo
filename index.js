@@ -68,13 +68,13 @@ try {
 
       getData(element.branchName, githubToken).then((response) => {
         const target = response.data;
-        console.log(`Fetched data: ${JSON.stringify(target)}`);
+        console.log(`Fetched data: ${JSON.stringify(target, null, 2)}`);
         // Updating keys
         console.log("Fetch successful");
         console.log("Updating keys...");
         updateKeys(source.base, target.base);
-        console.log(`develop: ${JSON.stringify(source)}`);
-        console.log(`${element.branchName} now: ${JSON.stringify(target)}`);
+        console.log(`develop: ${JSON.stringify(source, null, 2)}`);
+        console.log(`${element.branchName} now: ${JSON.stringify(target, null, 2)}\n`);
       });
     });
   });
