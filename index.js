@@ -134,15 +134,14 @@ const main = () => {
         const translationBranch = branch.split("/")[0] + "-translations";
 
         try {
-          const target = (await getData(branch, githubToken)).data;
+          const target = await getData(branch, githubToken);
 
-          updateKeys(source.base, target.base);
+          updateKeys(source.base, target.data.base);
 
-          const branchRefSHA = (await getBranchRef(branch, githubToken)).data
-            .object.sha;
+          const branchRefSHA = await getBranchRef(branch, githubToken);
 
           await createBranch(translationBranch).translationBranch,
-            branchRefSHA,
+            branchRefSHA.data.object.sha,
             githubToken;
 
           const translationFileSHA = await getTranslationsFile(
@@ -152,7 +151,7 @@ const main = () => {
 
           await updateTranslations(
             target,
-            translationFileSHA,
+            translationFileSHA.data.sha,
             translationBranch,
             githubToken
           );
