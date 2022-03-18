@@ -52,10 +52,13 @@ const getBranchRef = async (branchName, token) => {
   );
 };
 
-const createBranch = async (token, data) => {
+const createBranch = async (newBranchName, sha, token) => {
   return await axios.post(
     `https://api.github.com/repos/Khalester/TestGithubActions/git/refs`,
-    data,
+    JSON.stringify({
+      ref: `refs/heads/${newBranchName}`,
+      sha,
+    }),
     {
       headers: {
         Authorization: `token ${token}`,
@@ -83,12 +86,6 @@ const getTranslationsFile = async (branchName, token) => {
   );
 };
 
-/**
- * Given a token and a data, updates the translations.
- * @param {string} token - The token for the authorization header.
- * @param {*} data - The data of the translations to update the file with
- * @returns
- */
 const updateTranslations = async (content, sha, branchName, token) => {
   try {
     return await axios.put(
@@ -136,13 +133,17 @@ try {
 
         const translationBranch = branch.split("/")[0] + "/translations";
 
+        getBranchRef(branch, githubToken).then((response) => {
+          createBranch('testBranch', response.data.sha, githubToken);
+        })
+
         // Gets translations file
         getTranslationsFile(translationBranch, githubToken).then((response) => {
           updateTranslations(
             target,
             response.data.sha,
             translationBranch,
-            githubToken,
+            githubToken
           ).catch((error) => {
             console.error("Error updating translations", error);
           });
