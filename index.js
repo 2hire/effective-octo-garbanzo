@@ -133,33 +133,35 @@ const main = () => {
         const branch = element.branchName;
         const translationBranch = branch.split("/")[0] + "-translations";
 
-        try {
-          const target = await getData(branch, githubToken);
-
-          updateKeys(source.base, target.data.base);
-
-          const branchRefSHA = await getBranchRef(branch, githubToken);
-
-          await createBranch(translationBranch).translationBranch,
-            branchRefSHA.data.object.sha,
-            githubToken;
-
-          const translationFileSHA = await getTranslationsFile(
-            translationBranch,
-            githubToken
-          );
-
-          await updateTranslations(
-            target,
-            translationFileSHA.data.sha,
-            translationBranch,
-            githubToken
-          );
-
-          await createPullRequest(translationBranch, branch, githubToken);
-        } catch (error) {
-          console.log(error);
-        }
+        getData(branch, githubToken)
+          .then((response) => {
+            const target = response.data;
+            // Updating keys
+            updateKeys(source.base, target.base);
+          })
+          .then(() => getBranchRef(branch, githubToken))
+          .then((response) => {
+            createBranch(
+              translationBranch,
+              response.data.object.sha,
+              githubToken
+            );
+          })
+          .then(() => getTranslationsFile(translationBranch, githubToken))
+          .then((response) => {
+            updateTranslations(
+              target,
+              response.data.sha,
+              translationBranch,
+              githubToken
+            );
+          })
+          .then(() => {
+            createPullRequest(translationBranch, branch, githubToken);
+          })
+          .catch((error) => {
+            console.error("Error updating translations", error);
+          });
 
         // getData(branch, githubToken).then((response) => {
         //   const target = response.data;
