@@ -135,20 +135,20 @@ try {
 
         getBranchRef(branch, githubToken).then((r) => {
           console.log(r.data);
-          createBranch('testBranch', r.data.sha, githubToken);
+          createBranch('testBranch', r.data.object.sha, githubToken);
         })
 
         // Gets translations file
-        getTranslationsFile(translationBranch, githubToken).then((response) => {
-          updateTranslations(
-            target,
-            response.data.sha,
-            translationBranch,
-            githubToken
-          ).catch((error) => {
-            console.error("Error updating translations", error);
-          });
-        });
+        // getTranslationsFile(translationBranch, githubToken).then((response) => {
+        //   updateTranslations(
+        //     target,
+        //     response.data.sha,
+        //     translationBranch,
+        //     githubToken
+        //   ).catch((error) => {
+        //     console.error("Error updating translations", error);
+        //   });
+        // });
       });
     });
   });
