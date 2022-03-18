@@ -135,7 +135,7 @@ try {
 
         getBranchRef(branch, githubToken).then((r) => {
           console.log(r.data);
-          createBranch(`${translationBranch}/testBranch`, r.data.object.sha, githubToken);
+          createBranch(`${branch.split("/")[0]}-translations`, r.data.object.sha, githubToken);
         })
 
         // Gets translations file
