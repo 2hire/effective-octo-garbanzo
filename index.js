@@ -108,7 +108,7 @@ try {
         // // Updating keys
         // console.log("Fetch successful");
         // console.log("Updating keys...");
-        // updateKeys(source.base, target.base);
+        updateKeys(source.base, target.base);
         // console.log(`develop: ${JSON.stringify(source, null, 2)}`);
 
         console.log(`${branch} now: ${JSON.stringify(target, null, 2)}\n`);
@@ -119,7 +119,7 @@ try {
           updateTranslations(
             translationBranch,
             githubToken,
-            target,
+            JSON.stringify(target),
             response.sha
           )
             .then((response) => {
