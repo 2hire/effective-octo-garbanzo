@@ -43,7 +43,7 @@ const updateKeys = (source, target) => {
 
 const getTranslationsFile = async (branchName, token) => {
   return await axios.get(
-    `https://api.github.com/repos/Khalester/TestGithubActions/contents/index.js?ref=${branchName}`,
+    `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.js?ref=${branchName}`,
     {
       headers: {
         Authorization: `token ${token}`,
@@ -87,30 +87,30 @@ try {
   const githubToken = core.getInput("github-token");
   const appInfo = JSON.parse(core.getInput("app-info"));
 
-  console.log("Reading file from the given path");
+  // console.log("Reading file from the given path");
   // Read file from path
   fs.readFile(path, "utf-8", (error, data) => {
     if (error) {
       return console.error(error);
     }
 
-    console.log("Read successful");
+    // console.log("Read successful");
 
     const source = JSON.parse(data);
 
     appInfo.forEach((element) => {
       const branch = element.branchName;
-      console.log(`Fetching translations from ${branch}...`);
+      // console.log(`Fetching translations from ${branch}...`);
 
       getData(branch, githubToken).then((response) => {
         const target = response.data;
-        console.log(`Fetched data: ${JSON.stringify(target, null, 2)}`);
-        // Updating keys
-        console.log("Fetch successful");
-        console.log("Updating keys...");
-        updateKeys(source.base, target.base);
-        console.log(`develop: ${JSON.stringify(source, null, 2)}`);
-        console.log(`${branch} now: ${JSON.stringify(target, null, 2)}\n`);
+        // console.log(`Fetched data: ${JSON.stringify(target, null, 2)}`);
+        // // Updating keys
+        // console.log("Fetch successful");
+        // console.log("Updating keys...");
+        // updateKeys(source.base, target.base);
+        // console.log(`develop: ${JSON.stringify(source, null, 2)}`);
+        // console.log(`${branch} now: ${JSON.stringify(target, null, 2)}\n`);
 
         console.log("Updating translations...");
         const translationBranch = branch.split("/")[0] + '/translations';
