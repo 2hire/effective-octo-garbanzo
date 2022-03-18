@@ -115,7 +115,7 @@ const createPullRequest = async (head, base, token) => {
   }
 };
 
-const main = async () => {
+const main = () => {
   try {
     // Getting inputs from action
     const path = core.getInput("file-path");
@@ -129,40 +129,38 @@ const main = async () => {
       }
       const source = JSON.parse(data);
 
-      appInfo.forEach((element) => {
+      appInfo.forEach(async (element) => {
         const branch = element.branchName;
         const translationBranch = branch.split("/")[0] + "-translations";
 
         try {
           const target = (await getData(branch, githubToken)).data;
-  
+
           updateKeys(source.base, target.base);
-  
+
           const branchRefSHA = (await getBranchRef(branch, githubToken)).data
             .object.sha;
-  
+
           await createBranch(translationBranch).translationBranch,
             branchRefSHA,
             githubToken;
-  
+
           const translationFileSHA = await getTranslationsFile(
             translationBranch,
             githubToken
           );
-  
+
           await updateTranslations(
             target,
             translationFileSHA,
             translationBranch,
             githubToken
           );
-  
-          await createPullRequest(translationBranch, branch, githubToken);
 
+          await createPullRequest(translationBranch, branch, githubToken);
         } catch (error) {
           console.log(error);
         }
-
 
         // getData(branch, githubToken).then((response) => {
         //   const target = response.data;
