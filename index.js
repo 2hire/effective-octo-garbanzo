@@ -1,5 +1,4 @@
 const core = require("@actions/core");
-const github = require("@actions/github");
 const axios = require("axios");
 const fs = require("fs");
 
@@ -41,6 +40,12 @@ const updateKeys = (source, target) => {
   }
 };
 
+/**
+ * Given a branch name and a token, fetches the translations.
+ * @param {string} branchName - The branch name to fetch the translations from.
+ * @param {string} token - The token for the authorization header.
+ * @returns The file infos.
+ */
 const getTranslationsFile = async (branchName, token) => {
   return await axios.get(
     `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.json?ref=${branchName}`,
@@ -53,6 +58,12 @@ const getTranslationsFile = async (branchName, token) => {
   );
 };
 
+/**
+ * Given a token and a data, updates the translations.
+ * @param {string} token - The token for the authorization header.
+ * @param {*} data - The data of the translations to update the file with
+ * @returns
+ */
 const updateTranslations = async (token, data) => {
   try {
     return await axios.put(
@@ -66,61 +77,48 @@ const updateTranslations = async (token, data) => {
       }
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
 try {
-  console.log("Getting inputs from action");
   // Getting inputs from action
   const path = core.getInput("file-path");
   const githubToken = core.getInput("github-token");
   const appInfo = JSON.parse(core.getInput("app-info"));
 
-  // console.log("Reading file from the given path");
   // Read file from path
   fs.readFile(path, "utf-8", (error, data) => {
     if (error) {
       return console.error(error);
     }
-
-    // console.log("Read successful");
-
     const source = JSON.parse(data);
 
     appInfo.forEach((element) => {
       const branch = element.branchName;
-      // console.log(`Fetching translations from ${branch}...`);
-
       getData(branch, githubToken).then((response) => {
         const target = response.data;
-        // console.log(`Fetched data: ${JSON.stringify(target, null, 2)}`);
-        // // Updating keys
-        // console.log("Fetch successful");
-        // console.log("Updating keys...");
+        // Updating keys
         updateKeys(source.base, target.base);
-        // console.log(`develop: ${JSON.stringify(source, null, 2)}`);
 
-        console.log(`${branch} now: ${JSON.stringify(target, null, 2)}\n`);
-
-        console.log("Updating translations...");
         const translationBranch = branch.split("/")[0] + "/translations";
+
+        // Gets translations file
         getTranslationsFile(translationBranch, githubToken).then((response) => {
           updateTranslations(
             githubToken,
             JSON.stringify({
               message: "[Translation Sync] Updated translations",
-              content: Buffer.from(JSON.stringify(target, null, 2), "utf-8").toString("base64"),
+              content: Buffer.from(
+                JSON.stringify(target, null, 2),
+                "utf-8"
+              ).toString("base64"),
               sha: response.data.sha,
               branch: translationBranch,
             })
-          )
-            .then((response) => {
-              console.log("Translations updated");
-            })
-            .catch((error) => {
-              console.error("Error updating translations");
-            });
+          ).catch((error) => {
+            console.error("Error updating translations", error);
+          });
         });
       });
     });
