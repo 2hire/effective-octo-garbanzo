@@ -74,7 +74,7 @@ const updateTranslations = async (content, sha, branchName, token) => {
     return await axios.put(
       `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.json`,
       JSON.stringify({
-        message: "[Translation Sync] Updated translations",
+        message: "[Translation Sync] Updated translations [skip ci]",
         content: Buffer.from(
           JSON.stringify(content, null, 2),
           "utf-8"
