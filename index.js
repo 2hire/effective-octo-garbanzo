@@ -53,21 +53,11 @@ const getTranslationsFile = async (branchName, token) => {
   );
 };
 
-const updateTranslations = async (
-  branchName,
-  token,
-  updatedTranslations,
-  sha
-) => {
+const updateTranslations = async (token, data) => {
   try {
     return await axios.put(
       `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.json`,
-      {
-        message: "[Translation Sync] Updated translations",
-        content: updatedTranslations,
-        sha,
-        branch: branchName,
-      },
+      data,
       {
         headers: {
           Authorization: `token ${token}`,
@@ -116,13 +106,13 @@ try {
         console.log("Updating translations...");
         const translationBranch = branch.split("/")[0] + "/translations";
         getTranslationsFile(translationBranch, githubToken).then((response) => {
-          console.log("RESPONSE", JSON.stringify(response.data, null, 2));
-          console.log("SHA:", response.data.sha);
           updateTranslations(
-            translationBranch,
             githubToken,
-            JSON.stringify(target, null, 2),
-            response.data.sha
+            JSON.stringify({
+              message: "[Translation Sync] Updated translations",
+              sha: response.data.sha,
+              branch: translationBranch,
+            })
           )
             .then((response) => {
               console.log("Translations updated");
