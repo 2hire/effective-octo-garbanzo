@@ -134,9 +134,11 @@ const main = () => {
           const branch = element.branchName;
           const translationBranch = branch.split("/")[0] + "-translations";
   
+          // Get translations data
           const responseData = await getData(branch, githubToken);
           if (responseData.data) {
             const target = responseData.data;
+            // Updates target keys
             updateKeys(source.base, target.base);
             const responseBranchRef = await getBranchRef(branch, githubToken);
             if (responseBranchRef.data) {
@@ -153,40 +155,6 @@ const main = () => {
         } catch(error) {
           console.error(error);
         }
-
-        // getData(branch, githubToken).then((response) => {
-        //   const target = response.data;
-        //   // Updating keys
-        //   updateKeys(source.base, target.base);
-
-        //   const translationBranch = branch.split("/")[0] + "-translations";
-
-        //   getBranchRef(branch, githubToken).then((r) => {
-        //     createBranch(
-        //       translationBranch,
-        //       r.data.object.sha,
-        //       githubToken
-        //     ).then(() => {
-        //       // Gets translations file
-        //       getTranslationsFile(translationBranch, githubToken).then(
-        //         (response) => {
-        //           updateTranslations(
-        //             target,
-        //             response.data.sha,
-        //             translationBranch,
-        //             githubToken
-        //           )
-        //             .then(() => {
-        //               createPullRequest(translationBranch, branch, githubToken);
-        //             })
-        //             .catch((error) => {
-        //               console.error("Error updating translations", error);
-        //             });
-        //         }
-        //       );
-        //     });
-        //   });
-        // });
       });
     });
   } catch (error) {
