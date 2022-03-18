@@ -7,8 +7,8 @@ inputs:
   app-info:
     description: 'Apps list'
     required: true
-  github-token:
-    description: 'Github token'
+  token:
+    description: 'token'
     required: true
 runs:
   using: 'node16'

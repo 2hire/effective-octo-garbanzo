@@ -119,7 +119,7 @@ const main = () => {
   try {
     // Getting inputs from action
     const path = core.getInput("file-path");
-    const githubToken = core.getInput("github-token");
+    const token = core.getInput("token");
     const appInfo = JSON.parse(core.getInput("app-info"));
 
     // Read file from path
@@ -135,20 +135,20 @@ const main = () => {
           const translationBranch = branch.split("/")[0] + "-translations";
   
           // Get translations data
-          const responseData = await getData(branch, githubToken);
+          const responseData = await getData(branch, token);
           if (responseData.data) {
             const target = responseData.data;
             // Updates target keys
             updateKeys(source.base, target.base);
-            const responseBranchRef = await getBranchRef(branch, githubToken);
+            const responseBranchRef = await getBranchRef(branch, token);
             if (responseBranchRef.data) {
               const branchRefSHA = responseBranchRef.data.object.sha;
-              await createBranch(translationBranch, branchRefSHA, githubToken);
-              const responseTranslationsFile = await getTranslationsFile(translationBranch, githubToken);
+              await createBranch(translationBranch, branchRefSHA, token);
+              const responseTranslationsFile = await getTranslationsFile(translationBranch, token);
               if (responseTranslationsFile.data) {
                 const translationsFileSHA = responseTranslationsFile.data.sha;
-                await updateTranslations(target, translationsFileSHA, translationBranch, githubToken);
-                await createPullRequest(translationBranch, branch, githubToken);
+                await updateTranslations(target, translationsFileSHA, translationBranch, token);
+                await createPullRequest(translationBranch, branch, token);
               }
             }
           }
