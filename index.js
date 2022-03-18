@@ -110,7 +110,7 @@ try {
             githubToken,
             JSON.stringify({
               message: "[Translation Sync] Updated translations",
-              content: JSON.stringify(target, null, 2),
+              content: Buffer.from(JSON.stringify(target, null, 2).toString("base64")),
               sha: response.data.sha,
               branch: translationBranch,
             })
