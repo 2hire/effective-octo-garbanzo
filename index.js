@@ -135,20 +135,28 @@ const main = () => {
 
         getData(branch, githubToken)
           .then((response) => {
+            console.log("Getting data");
             const target = response.data;
-            // Updating keys
             updateKeys(source.base, target.base);
           })
-          .then(() => getBranchRef(branch, githubToken))
+          .then(() => {
+            console.log("Getting branch ref");
+            return getBranchRef(branch, githubToken);
+          })
           .then((response) => {
+            console.log("Creating branch");
             createBranch(
               translationBranch,
               response.data.object.sha,
               githubToken
             );
           })
-          .then(() => getTranslationsFile(translationBranch, githubToken))
+          .then(() => {
+            console.log("Getting translation file info");
+            return getTranslationsFile(translationBranch, githubToken);
+          })
           .then((response) => {
+            console.log("Updating translations");
             updateTranslations(
               target,
               response.data.sha,
@@ -157,6 +165,7 @@ const main = () => {
             );
           })
           .then(() => {
+            console.log("Creating pull request");
             createPullRequest(translationBranch, branch, githubToken);
           })
           .catch((error) => {
