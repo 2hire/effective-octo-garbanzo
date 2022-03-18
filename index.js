@@ -30,11 +30,7 @@ const getData = async (branchName, token) => {
  * @param {object} target - The target object.
  */
 const updateKeys = (source, target) => {
-  if (
-    typeof source === "object" &&
-    !Array.isArray(source) &&
-    source !== null
-  ) {
+  if (typeof source === "object" && !Array.isArray(source) && source !== null) {
     const sourceKeys = Object.keys(source);
     sourceKeys.forEach((key) => {
       if (!target.hasOwnProperty(key)) target[key] = source[key];
@@ -42,6 +38,45 @@ const updateKeys = (source, target) => {
         updateKeys(source[key], target[key]);
       }
     });
+  }
+};
+
+const getTranslationsFile = async (branchName, token) => {
+  return await axios.get(
+    `https://api.github.com/repos/Khalester/TestGithubActions/contents/index.js?ref=${branchName}`,
+    {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    }
+  );
+};
+
+const updateTranslations = async (
+  branchName,
+  token,
+  updatedTranslations,
+  sha
+) => {
+  try {
+    return await axios.put(
+      `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translation.js`,
+      {
+        message: "[Translation Sync] Updated translations",
+        content: updatedTranslations,
+        sha: sha,
+        branch: branchName,
+      },
+      {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
+    );
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -64,9 +99,10 @@ try {
     const source = JSON.parse(data);
 
     appInfo.forEach((element) => {
-      console.log(`Fetching translations from ${element.branchName}...`);
+      const branch = element.branchName;
+      console.log(`Fetching translations from ${branch}...`);
 
-      getData(element.branchName, githubToken).then((response) => {
+      getData(branch, githubToken).then((response) => {
         const target = response.data;
         console.log(`Fetched data: ${JSON.stringify(target, null, 2)}`);
         // Updating keys
@@ -74,7 +110,20 @@ try {
         console.log("Updating keys...");
         updateKeys(source.base, target.base);
         console.log(`develop: ${JSON.stringify(source, null, 2)}`);
-        console.log(`${element.branchName} now: ${JSON.stringify(target, null, 2)}\n`);
+        console.log(`${branch} now: ${JSON.stringify(target, null, 2)}\n`);
+
+        console.log("Updating translations...");
+        const translationBranch = branch.split("/")[0];
+        const sha = getTranslationsFile(translationBranch, githubToken).then(
+          (response) => response.sha
+        );
+        updateTranslations(translationBranch, githubToken, target, sha)
+          .then((response) => {
+            console.log("Translations updated");
+          })
+          .catch((error) => {
+            console.error("Error updating translations");
+          });
       });
     });
   });
