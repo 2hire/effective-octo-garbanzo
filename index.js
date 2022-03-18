@@ -116,13 +116,13 @@ try {
         console.log("Updating translations...");
         const translationBranch = branch.split("/")[0] + "/translations";
         getTranslationsFile(translationBranch, githubToken).then((response) => {
-          console.log("RESPONSE", JSON.stringify(response, null, 2));
-          console.log("SHA:", response.sha);
+          console.log("RESPONSE", JSON.stringify(response.data, null, 2));
+          console.log("SHA:", response.data.sha);
           updateTranslations(
             translationBranch,
             githubToken,
             target,
-            response.sha
+            response.data.sha
           )
             .then((response) => {
               console.log("Translations updated");
