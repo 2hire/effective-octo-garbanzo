@@ -61,7 +61,7 @@ const updateTranslations = async (
 ) => {
   try {
     return await axios.put(
-      `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translation.json`,
+      `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.json`,
       {
         message: "[Translation Sync] Updated translations",
         content: updatedTranslations,
@@ -119,7 +119,7 @@ try {
           updateTranslations(
             translationBranch,
             githubToken,
-            JSON.stringify(target),
+            target,
             response.sha
           )
             .then((response) => {
