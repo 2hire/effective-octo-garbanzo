@@ -129,66 +129,30 @@ const main = () => {
       }
       const source = JSON.parse(data);
 
-      appInfo.forEach((element) => {
-        const branch = element.branchName;
-        const translationBranch = branch.split("/")[0] + "-translations";
-
-        getData(branch, githubToken)
-          .then((response) => {
-            console.log("Getting data");
-            const target = response.data;
-            return new Promise((resolve) => {
-              resolve(updateKeys(source.base, target.base));
-            });
-          })
-          .then(() => {
-            console.log("Getting branch ref");
-            return new Promise((resolve) => {
-              resolve(getBranchRef(branch, githubToken));
-            });
-          })
-          .then((response) => {
-            console.log("Creating branch");
-            return new Promise((resolve) => {
-              resolve(
-                createBranch(
-                  translationBranch,
-                  response.data.object.sha,
-                  githubToken
-                )
-              );
-            });
-          })
-          .then(() => {
-            console.log("Getting translation file info");
-            return new Promise((resolve) => {
-              resolve(getTranslationsFile(translationBranch, githubToken));
-            });
-          })
-          .then((response) => {
-            console.log("Updating translations");
-            return new Promise((resolve) => {
-              resolve(
-                updateTranslations(
-                  target,
-                  response.data.sha,
-                  translationBranch,
-                  githubToken
-                )
-              );
-            });
-          })
-          .then(() => {
-            console.log("Creating pull request");
-            return new Promise((resolve) => {
-              resolve(
-                createPullRequest(translationBranch, branch, githubToken)
-              );
-            });
-          })
-          .catch((error) => {
-            console.error("Error updating translations", error);
-          });
+      appInfo.forEach(async (element) => {
+        try {
+          const branch = element.branchName;
+          const translationBranch = branch.split("/")[0] + "-translations";
+  
+          const responseData = await getData(branch, githubToken);
+          if (responseData.data) {
+            const target = responseData.data;
+            updateKeys(source.base, target.base);
+            const responseBranchRef = await getBranchRef(branch, githubToken);
+            if (responseBranchRef.data) {
+              const branchRefSHA = responseBranchRef.data.object.sha;
+              await createBranch(translationBranch, branchRefSHA, githubToken);
+              const responseTranslationsFile = await getTranslationsFile(translationBranch, githubToken);
+              if (responseTranslationsFile.data) {
+                const translationsFileSHA = responseTranslationsFile.data.sha;
+                await updateTranslations(target, translationsFileSHA, translationBranch, githubToken);
+                await createPullRequest(translationBranch, branch, githubToken);
+              }
+            }
+          }
+        } catch(error) {
+          console.error(error);
+        }
 
         // getData(branch, githubToken).then((response) => {
         //   const target = response.data;
