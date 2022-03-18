@@ -129,7 +129,7 @@ const main = () => {
       }
       const source = JSON.parse(data);
 
-      appInfo.forEach(async (element) => {
+      appInfo.forEach((element) => {
         const branch = element.branchName;
         const translationBranch = branch.split("/")[0] + "-translations";
 
@@ -137,36 +137,54 @@ const main = () => {
           .then((response) => {
             console.log("Getting data");
             const target = response.data;
-            updateKeys(source.base, target.base);
+            return new Promise((resolve) => {
+              resolve(updateKeys(source.base, target.base));
+            });
           })
           .then(() => {
             console.log("Getting branch ref");
-            return getBranchRef(branch, githubToken);
+            return new Promise((resolve) => {
+              resolve(getBranchRef(branch, githubToken));
+            });
           })
           .then((response) => {
             console.log("Creating branch");
-            createBranch(
-              translationBranch,
-              response.data.object.sha,
-              githubToken
-            );
+            return new Promise((resolve) => {
+              resolve(
+                createBranch(
+                  translationBranch,
+                  response.data.object.sha,
+                  githubToken
+                )
+              );
+            });
           })
           .then(() => {
             console.log("Getting translation file info");
-            return getTranslationsFile(translationBranch, githubToken);
+            return new Promise((resolve) => {
+              resolve(getTranslationsFile(translationBranch, githubToken));
+            });
           })
           .then((response) => {
             console.log("Updating translations");
-            updateTranslations(
-              target,
-              response.data.sha,
-              translationBranch,
-              githubToken
-            );
+            return new Promise((resolve) => {
+              resolve(
+                updateTranslations(
+                  target,
+                  response.data.sha,
+                  translationBranch,
+                  githubToken
+                )
+              );
+            });
           })
           .then(() => {
             console.log("Creating pull request");
-            createPullRequest(translationBranch, branch, githubToken);
+            return new Promise((resolve) => {
+              resolve(
+                createPullRequest(translationBranch, branch, githubToken)
+              );
+            });
           })
           .catch((error) => {
             console.error("Error updating translations", error);
