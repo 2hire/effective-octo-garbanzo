@@ -2,12 +2,6 @@ const core = require("@actions/core");
 const axios = require("axios");
 const fs = require("fs");
 
-/**
- * Given a branch name and a token, fetches the translations from the given branch.
- * @param {string} branchName - The branch name to get data from.
- * @param {string} token - The token for the authorization header.
- * @returns promise with fetched json data.
- */
 const getData = async (branchName, token) => {
   try {
     return await axios.get(
@@ -23,11 +17,6 @@ const getData = async (branchName, token) => {
   }
 };
 
-/**
- * Given a source object and a target object, updates the target object with missing keys.
- * @param {object} source - The source object.
- * @param {object} target - The target object.
- */
 const updateKeys = (source, target) => {
   if (typeof source === "object" && !Array.isArray(source) && source !== null) {
     const sourceKeys = Object.keys(source);
@@ -68,12 +57,6 @@ const createBranch = async (newBranchName, sha, token) => {
   );
 };
 
-/**
- * Given a branch name and a token, fetches the translations.
- * @param {string} branchName - The branch name to fetch the translations from.
- * @param {string} token - The token for the authorization header.
- * @returns The file infos.
- */
 const getTranslationsFile = async (branchName, token) => {
   return await axios.get(
     `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.json?ref=${branchName}`,
@@ -111,6 +94,26 @@ const updateTranslations = async (content, sha, branchName, token) => {
   }
 };
 
+const createPullRequest = async (head, base, token) => {
+  try {
+    return await axios.post(
+      'https://api.github.com/repos/Khalester/TestGithubActions/pulls',
+      JSON.stringify({
+        head,
+        base
+      }),
+      {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
+    )
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 try {
   // Getting inputs from action
   const path = core.getInput("file-path");
@@ -134,7 +137,6 @@ try {
         const translationBranch = branch.split("/")[0] + "-translations";
 
         getBranchRef(branch, githubToken).then((r) => {
-          console.log(r.data);
           createBranch(
             translationBranch,
             r.data.object.sha,
@@ -148,7 +150,11 @@ try {
                   response.data.sha,
                   translationBranch,
                   githubToken
-                ).catch((error) => {
+                )
+                .then(() => {
+                  createPullRequest(translationBranch, branch, githubToken);
+                })
+                .catch((error) => {
                   console.error("Error updating translations", error);
                 });
               }
