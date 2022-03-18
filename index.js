@@ -97,11 +97,11 @@ const updateTranslations = async (content, sha, branchName, token) => {
 const createPullRequest = async (head, base, token) => {
   try {
     return await axios.post(
-      'https://api.github.com/repos/Khalester/TestGithubActions/pulls',
+      "https://api.github.com/repos/Khalester/TestGithubActions/pulls",
       JSON.stringify({
         head,
         base,
-        title: `[Translation Sync] Merging ${head} to ${base}`
+        title: `[Translation Sync] Merging ${head} to ${base}`,
       }),
       {
         headers: {
@@ -109,62 +109,99 @@ const createPullRequest = async (head, base, token) => {
           Accept: "application/vnd.github.v3+json",
         },
       }
-    )
+    );
   } catch (error) {
     console.error(error);
   }
-}
+};
 
-try {
-  // Getting inputs from action
-  const path = core.getInput("file-path");
-  const githubToken = core.getInput("github-token");
-  const appInfo = JSON.parse(core.getInput("app-info"));
+const main = async () => {
+  try {
+    // Getting inputs from action
+    const path = core.getInput("file-path");
+    const githubToken = core.getInput("github-token");
+    const appInfo = JSON.parse(core.getInput("app-info"));
 
-  // Read file from path
-  fs.readFile(path, "utf-8", (error, data) => {
-    if (error) {
-      return console.error(error);
-    }
-    const source = JSON.parse(data);
+    // Read file from path
+    fs.readFile(path, "utf-8", (error, data) => {
+      if (error) {
+        return console.error(error);
+      }
+      const source = JSON.parse(data);
 
-    appInfo.forEach((element) => {
-      const branch = element.branchName;
-      getData(branch, githubToken).then((response) => {
-        const target = response.data;
-        // Updating keys
-        updateKeys(source.base, target.base);
-
+      appInfo.forEach((element) => {
+        const branch = element.branchName;
         const translationBranch = branch.split("/")[0] + "-translations";
 
-        getBranchRef(branch, githubToken).then((r) => {
-          createBranch(
+        try {
+          const target = (await getData(branch, githubToken)).data;
+  
+          updateKeys(source.base, target.base);
+  
+          const branchRefSHA = (await getBranchRef(branch, githubToken)).data
+            .object.sha;
+  
+          await createBranch(translationBranch).translationBranch,
+            branchRefSHA,
+            githubToken;
+  
+          const translationFileSHA = await getTranslationsFile(
             translationBranch,
-            r.data.object.sha,
             githubToken
-          ).then(() => {
-            // Gets translations file
-            getTranslationsFile(translationBranch, githubToken).then(
-              (response) => {
-                updateTranslations(
-                  target,
-                  response.data.sha,
-                  translationBranch,
-                  githubToken
-                )
-                .then(() => {
-                  createPullRequest(translationBranch, branch, githubToken);
-                })
-                .catch((error) => {
-                  console.error("Error updating translations", error);
-                });
-              }
-            );
-          });
-        });
+          );
+  
+          await updateTranslations(
+            target,
+            translationFileSHA,
+            translationBranch,
+            githubToken
+          );
+  
+          await createPullRequest(translationBranch, branch, githubToken);
+
+        } catch (error) {
+          console.log(error);
+        }
+
+
+        // getData(branch, githubToken).then((response) => {
+        //   const target = response.data;
+        //   // Updating keys
+        //   updateKeys(source.base, target.base);
+
+        //   const translationBranch = branch.split("/")[0] + "-translations";
+
+        //   getBranchRef(branch, githubToken).then((r) => {
+        //     createBranch(
+        //       translationBranch,
+        //       r.data.object.sha,
+        //       githubToken
+        //     ).then(() => {
+        //       // Gets translations file
+        //       getTranslationsFile(translationBranch, githubToken).then(
+        //         (response) => {
+        //           updateTranslations(
+        //             target,
+        //             response.data.sha,
+        //             translationBranch,
+        //             githubToken
+        //           )
+        //             .then(() => {
+        //               createPullRequest(translationBranch, branch, githubToken);
+        //             })
+        //             .catch((error) => {
+        //               console.error("Error updating translations", error);
+        //             });
+        //         }
+        //       );
+        //     });
+        //   });
+        // });
       });
     });
-  });
-} catch (error) {
-  core.setFailed(error.message);
-}
+  } catch (error) {
+    core.setFailed(error.message);
+  }
+};
+
+main();
