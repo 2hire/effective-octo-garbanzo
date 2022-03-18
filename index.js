@@ -131,24 +131,30 @@ try {
         // Updating keys
         updateKeys(source.base, target.base);
 
-        const translationBranch = branch.split("/")[0] + "/translations";
+        const translationBranch = branch.split("/")[0] + "-translations";
 
         getBranchRef(branch, githubToken).then((r) => {
           console.log(r.data);
-          createBranch(`${branch.split("/")[0]}-translations`, r.data.object.sha, githubToken);
-        })
-
-        // Gets translations file
-        // getTranslationsFile(translationBranch, githubToken).then((response) => {
-        //   updateTranslations(
-        //     target,
-        //     response.data.sha,
-        //     translationBranch,
-        //     githubToken
-        //   ).catch((error) => {
-        //     console.error("Error updating translations", error);
-        //   });
-        // });
+          createBranch(
+            translationBranch,
+            r.data.object.sha,
+            githubToken
+          ).then(() => {
+            // Gets translations file
+            getTranslationsFile(translationBranch, githubToken).then(
+              (response) => {
+                updateTranslations(
+                  target,
+                  response.data.sha,
+                  translationBranch,
+                  githubToken
+                ).catch((error) => {
+                  console.error("Error updating translations", error);
+                });
+              }
+            );
+          });
+        });
       });
     });
   });
