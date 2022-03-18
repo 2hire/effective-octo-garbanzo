@@ -43,7 +43,7 @@ const updateKeys = (source, target) => {
 
 const getTranslationsFile = async (branchName, token) => {
   return await axios.get(
-    `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.js?ref=${branchName}`,
+    `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.json?ref=${branchName}`,
     {
       headers: {
         Authorization: `token ${token}`,
@@ -61,7 +61,7 @@ const updateTranslations = async (
 ) => {
   try {
     return await axios.put(
-      `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translation.js`,
+      `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translation.json`,
       {
         message: "[Translation Sync] Updated translations",
         content: updatedTranslations,
