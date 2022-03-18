@@ -113,7 +113,7 @@ try {
         console.log(`${branch} now: ${JSON.stringify(target, null, 2)}\n`);
 
         console.log("Updating translations...");
-        const translationBranch = branch.split("/")[0] + 'translations';
+        const translationBranch = branch.split("/")[0] + '/translations';
         const sha = getTranslationsFile(translationBranch, githubToken).then(
           (response) => response.sha
         );
