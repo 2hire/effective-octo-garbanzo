@@ -133,8 +133,9 @@ try {
 
         const translationBranch = branch.split("/")[0] + "/translations";
 
-        getBranchRef(branch, githubToken).then((response) => {
-          createBranch('testBranch', response.data.sha, githubToken);
+        getBranchRef(branch, githubToken).then((r) => {
+          console.log(r.data);
+          createBranch('testBranch', r.data.sha, githubToken);
         })
 
         // Gets translations file
