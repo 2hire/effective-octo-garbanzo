@@ -121,7 +121,7 @@ try {
           updateTranslations(
             translationBranch,
             githubToken,
-            target,
+            JSON.stringify(target, null, 2),
             response.data.sha
           )
             .then((response) => {
