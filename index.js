@@ -100,7 +100,8 @@ const createPullRequest = async (head, base, token) => {
       'https://api.github.com/repos/Khalester/TestGithubActions/pulls',
       JSON.stringify({
         head,
-        base
+        base,
+        title: `[Translation Sync] Merging ${head} to ${base}`
       }),
       {
         headers: {
