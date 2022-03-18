@@ -40,6 +40,31 @@ const updateKeys = (source, target) => {
   }
 };
 
+const getBranchRef = async (branchName, token) => {
+  return await axios.get(
+    `https://api.github.com/repos/Khalester/TestGithubActions/git/ref/heads/${branchName}`,
+    {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    }
+  );
+};
+
+const createBranch = async (token, data) => {
+  return await axios.post(
+    `https://api.github.com/repos/Khalester/TestGithubActions/git/refs`,
+    data,
+    {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    }
+  );
+};
+
 /**
  * Given a branch name and a token, fetches the translations.
  * @param {string} branchName - The branch name to fetch the translations from.
@@ -64,11 +89,19 @@ const getTranslationsFile = async (branchName, token) => {
  * @param {*} data - The data of the translations to update the file with
  * @returns
  */
-const updateTranslations = async (token, data) => {
+const updateTranslations = async (content, sha, branchName, token) => {
   try {
     return await axios.put(
       `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.json`,
-      data,
+      JSON.stringify({
+        message: "[Translation Sync] Updated translations",
+        content: Buffer.from(
+          JSON.stringify(content, null, 2),
+          "utf-8"
+        ).toString("base64"),
+        sha,
+        branch: branchName,
+      }),
       {
         headers: {
           Authorization: `token ${token}`,
@@ -106,16 +139,10 @@ try {
         // Gets translations file
         getTranslationsFile(translationBranch, githubToken).then((response) => {
           updateTranslations(
+            target,
+            response.data.sha,
+            translationBranch,
             githubToken,
-            JSON.stringify({
-              message: "[Translation Sync] Updated translations",
-              content: Buffer.from(
-                JSON.stringify(target, null, 2),
-                "utf-8"
-              ).toString("base64"),
-              sha: response.data.sha,
-              branch: translationBranch,
-            })
           ).catch((error) => {
             console.error("Error updating translations", error);
           });
