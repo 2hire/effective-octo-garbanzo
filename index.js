@@ -65,7 +65,7 @@ const updateTranslations = async (
       {
         message: "[Translation Sync] Updated translations",
         content: updatedTranslations,
-        sha: sha,
+        sha,
         branch: branchName,
       },
       {
@@ -110,20 +110,25 @@ try {
         // console.log("Updating keys...");
         // updateKeys(source.base, target.base);
         // console.log(`develop: ${JSON.stringify(source, null, 2)}`);
-        // console.log(`${branch} now: ${JSON.stringify(target, null, 2)}\n`);
+
+        console.log(`${branch} now: ${JSON.stringify(target, null, 2)}\n`);
 
         console.log("Updating translations...");
-        const translationBranch = branch.split("/")[0] + '/translations';
-        const sha = getTranslationsFile(translationBranch, githubToken).then(
-          (response) => response.sha
-        );
-        updateTranslations(translationBranch, githubToken, target, sha)
-          .then((response) => {
-            console.log("Translations updated");
-          })
-          .catch((error) => {
-            console.error("Error updating translations");
-          });
+        const translationBranch = branch.split("/")[0] + "/translations";
+        getTranslationsFile(translationBranch, githubToken).then((response) => {
+          updateTranslations(
+            translationBranch,
+            githubToken,
+            target,
+            response.sha
+          )
+            .then((response) => {
+              console.log("Translations updated");
+            })
+            .catch((error) => {
+              console.error("Error updating translations");
+            });
+        });
       });
     });
   });
