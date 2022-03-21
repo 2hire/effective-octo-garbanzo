@@ -22,6 +22,9 @@ const updateKeys = (source, target) => {
       else {
         updateKeys(source[key], target[key]);
       }
+      // sorts children keys
+      source[key] = sortObject(source[key]);
+      target[key] = sortObject(target[key]);
     });
   }
 };
@@ -152,7 +155,7 @@ const main = () => {
           if (responseData.data) {
             const target = responseData.data;
             // Updates target keys
-            updateKeys(source.base, target.base);
+            updateKeys(source, target);
             const responseBranchRef = await getBranchRef(branch, token);
             if (responseBranchRef.data) {
               const branchRefSHA = responseBranchRef.data.object.sha;
