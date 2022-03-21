@@ -3,14 +3,29 @@ const axios = require("axios");
 const fs = require("fs");
 
 const sortObject = (object) => {
-  if (typeof object === "object" && !Array.isArray(object) && object !== null) {
-    const unorderedObjectKeys = Object.keys(object);
-    return Object.keys(unorderedObjectKeys)
+  if (typeof object === "object" && !Array.isArray(object) && object !== null)
+    return Object.keys(object)
       .sort()
       .reduce((obj, key) => {
-        obj[key] = unorderedObjectKeys[key];
+        obj[key] = object[key];
         return obj;
       }, {});
+  return object;
+};
+
+
+const updateKeys = (source, target) => {
+  if (typeof source === "object" && !Array.isArray(source) && source !== null) {
+    const sourceKeys = Object.keys(source);
+    sourceKeys.forEach((key) => {
+      if (!target.hasOwnProperty(key)) target[key] = source[key];
+      else {
+        updateKeys(source[key], target[key]);
+      }
+      // sorts children keys
+      source[key] = sortObject(source[key]);
+      target[key] = sortObject(target[key]);
+    });
   }
 };
 
@@ -29,19 +44,6 @@ const getData = async (branchName, token) => {
   }
 };
 
-const updateKeys = (source, target) => {
-  if (typeof source === "object" && !Array.isArray(source) && source !== null) {
-    const sourceKeys = Object.keys(source);
-    sourceKeys.forEach((key) => {
-      if (!target.hasOwnProperty(key)) target[key] = source[key];
-      else {
-        updateKeys(source[key], target[key]);
-      }
-      source[key] = sortObject(source[key]);
-      target[key] = sortObject(target[key]);
-    });
-  }
-};
 
 const getBranchRef = async (branchName, token) => {
   return await axios.get(
@@ -153,7 +155,7 @@ const main = () => {
           if (responseData.data) {
             const target = responseData.data;
             // Updates target keys
-            updateKeys(source.base, target.base);
+            updateKeys(source, target);
             const responseBranchRef = await getBranchRef(branch, token);
             if (responseBranchRef.data) {
               const branchRefSHA = responseBranchRef.data.object.sha;
