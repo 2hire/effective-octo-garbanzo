@@ -3,7 +3,7 @@ const axios = require("axios");
 const fs = require("fs");
 
 const sortObject = (object) => {
-  if (typeof source === "object" && !Array.isArray(source) && source !== null) {
+  if (typeof object === "object" && !Array.isArray(object) && object !== null) {
     const unorderedObjectKeys = Object.keys(object);
     return Object.keys(unorderedObjectKeys)
       .sort()
