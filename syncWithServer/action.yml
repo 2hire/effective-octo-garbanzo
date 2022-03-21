@@ -1,5 +1,13 @@
-name: 'Hello World'
-description: 'Hello'
+name: 'Sync with server'
+description: 'Syncing translations with server'
+inputs:
+  token:
+    description: 'token'
+    required: true
+outputs:
+  downloaded-translations:
+    description: 'Translations to be saved'
+    
 runs:
   using: 'node16'
   main: 'index.js'
