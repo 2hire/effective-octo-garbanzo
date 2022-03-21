@@ -20,9 +20,9 @@ const main = async () => {
   try {
     const appInfo = JSON.parse(core.getInput("app-info"));
     const currentBranchName = core.getInput("current-branch");
+    console.log(currentBranchName);
     console.log(
       appInfo.find((branch) => branch.branchName === currentBranchName)
-        .serviceToken
     );
     const token = core.getInput("token");
     const data = await getData(token);
