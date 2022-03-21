@@ -18,13 +18,22 @@ const getData = async (token) => {
 
 const main = async () => {
   try {
+    const appInfo = JSON.parse(core.getInput("app-info"));
+    const currentBranchName = core.getInput("current-branch");
+    console.log(
+      appInfo.find((branch) => branch.branchName === currentBranchName)
+        .serviceToken
+    );
     const token = core.getInput("token");
     const data = await getData(token);
 
-    core.setOutput('downloaded-translations', JSON.stringify(data.data, null, 2));
+    core.setOutput(
+      "downloaded-translations",
+      JSON.stringify(data.data, null, 2)
+    );
   } catch (error) {
     core.setFailed(error.message);
   }
-}
+};
 
 main();

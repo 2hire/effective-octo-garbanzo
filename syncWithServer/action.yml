@@ -1,6 +1,12 @@
 name: 'Sync with server'
 description: 'Syncing translations with server'
 inputs:
+  app-info:
+    description: 'Apps list'
+    required: true
+  current-branch:
+    description: 'Current branch name'
+    required: true
   token:
     description: 'token'
     required: true
