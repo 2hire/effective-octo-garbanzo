@@ -21,7 +21,7 @@ const main = async () => {
     const token = core.getInput("token");
     const data = await getData(token);
 
-    core.setOutput('downloaded-translations', JSON.stringify(data, null, 2));
+    core.setOutput('downloaded-translations', JSON.stringify(data.data, null, 2));
   } catch (error) {
     core.setFailed(error.message);
   }
