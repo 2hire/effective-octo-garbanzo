@@ -16,6 +16,8 @@ const getData = async (token) => {
   }
 };
 
+const updateServerTranslations = () => console.log('Updating server translations');
+
 const main = async () => {
   try {
     const appInfo = JSON.parse(core.getInput("app-info"));
@@ -25,6 +27,9 @@ const main = async () => {
       appInfo.find((branch) => branch.branchName === currentBranchName)
     );
     const token = core.getInput("token");
+
+    updateServerTranslations();
+
     const data = await getData(token);
 
     core.setOutput(
