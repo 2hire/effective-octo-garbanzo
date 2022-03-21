@@ -1,5 +1,5 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'Update translations and create a pull request'
+description: 'Updates current translations and creates a pull request'
 inputs:
   file-path:
     description: 'Path to the file'
