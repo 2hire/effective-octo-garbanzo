@@ -2,6 +2,18 @@ const core = require("@actions/core");
 const axios = require("axios");
 const fs = require("fs");
 
+const sortObject = (object) => {
+  if (typeof source === "object" && !Array.isArray(source) && source !== null) {
+    const unorderedObjectKeys = Object.keys(object);
+    return Object.keys(unorderedObjectKeys)
+      .sort()
+      .reduce((obj, key) => {
+        obj[key] = unorderedObjectKeys[key];
+        return obj;
+      }, {});
+  }
+};
+
 const getData = async (branchName, token) => {
   try {
     return await axios.get(
@@ -25,6 +37,8 @@ const updateKeys = (source, target) => {
       else {
         updateKeys(source[key], target[key]);
       }
+      source[key] = sortObject(source[key]);
+      target[key] = sortObject(target[key]);
     });
   }
 };
@@ -133,7 +147,7 @@ const main = () => {
         try {
           const branch = element.branchName;
           const translationBranch = branch.split("/")[0] + "-translations";
-  
+
           // Get translations data
           const responseData = await getData(branch, token);
           if (responseData.data) {
@@ -144,15 +158,23 @@ const main = () => {
             if (responseBranchRef.data) {
               const branchRefSHA = responseBranchRef.data.object.sha;
               await createBranch(translationBranch, branchRefSHA, token);
-              const responseTranslationsFile = await getTranslationsFile(translationBranch, token);
+              const responseTranslationsFile = await getTranslationsFile(
+                translationBranch,
+                token
+              );
               if (responseTranslationsFile.data) {
                 const translationsFileSHA = responseTranslationsFile.data.sha;
-                await updateTranslations(target, translationsFileSHA, translationBranch, token);
+                await updateTranslations(
+                  target,
+                  translationsFileSHA,
+                  translationBranch,
+                  token
+                );
                 await createPullRequest(translationBranch, branch, token);
               }
             }
           }
-        } catch(error) {
+        } catch (error) {
           console.error(error);
         }
       });
