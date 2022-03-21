@@ -22,7 +22,6 @@ const updateKeys = (source, target) => {
       else {
         updateKeys(source[key], target[key]);
       }
-      // sorts children keys
       source[key] = sortObject(source[key]);
       target[key] = sortObject(target[key]);
     });
