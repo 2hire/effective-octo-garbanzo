@@ -48,43 +48,55 @@ const getRawJsonData = async (owner, repo, branchName, path, token) => {
 };
 
 const getBranchRef = async (owner, repo, branchName, token) => {
-  return await axios.get(
-    `https://api.github.com/repos/${owner}/${repo}/git/ref/heads/${branchName}`,
-    {
-      headers: {
-        Authorization: `token ${token}`,
-        Accept: "application/vnd.github.v3+json",
-      },
-    }
-  );
+  try {
+    return await axios.get(
+      `https://api.github.com/repos/${owner}/${repo}/git/ref/heads/${branchName}`,
+      {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
+    );
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const createBranch = async (owner, repo, newBranchName, sha, token) => {
-  return await axios.post(
-    `https://api.github.com/repos/${owner}/${repo}/git/refs`,
-    JSON.stringify({
-      ref: `refs/heads/${newBranchName}`,
-      sha,
-    }),
-    {
-      headers: {
-        Authorization: `token ${token}`,
-        Accept: "application/vnd.github.v3+json",
-      },
-    }
-  );
+  try {
+    return await axios.post(
+      `https://api.github.com/repos/${owner}/${repo}/git/refs`,
+      JSON.stringify({
+        ref: `refs/heads/${newBranchName}`,
+        sha,
+      }),
+      {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
+    );
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const getJsonFileInfo = async (owner, repo, branchName, path, token) => {
-  return await axios.get(
-    `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branchName}`,
-    {
-      headers: {
-        Authorization: `token ${token}`,
-        Accept: "application/vnd.github.v3+json",
-      },
-    }
-  );
+  try {
+    return await axios.get(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branchName}`,
+      {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
+    );
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const updateJson = async (
