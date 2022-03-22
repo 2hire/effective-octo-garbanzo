@@ -19,7 +19,7 @@ const updateAndSortKeys = (source, target) => {
     sourceKeys.forEach((key) => {
       if (!target.hasOwnProperty(key)) target[key] = source[key];
       else {
-        const [sKeys, tKeys] = updateKeys(source[key], target[key]);
+        const [sKeys, tKeys] = updateAndSortKeys(source[key], target[key]);
         source[key] = sKeys;
         target[key] = tKeys;
       }
