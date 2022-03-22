@@ -13,20 +13,23 @@ const sortObject = (object) => {
   return object;
 };
 
-
-const updateKeys = (source, target) => {
+const updateAndSortKeys = (source, target) => {
   if (typeof source === "object" && !Array.isArray(source) && source !== null) {
     const sourceKeys = Object.keys(source);
     sourceKeys.forEach((key) => {
       if (!target.hasOwnProperty(key)) target[key] = source[key];
       else {
-        updateKeys(source[key], target[key]);
+        const [sKeys, tKeys] = updateKeys(source[key], target[key]);
+        source[key] = sKeys;
+        target[key] = tKeys;
       }
       // sorts children keys
       source[key] = sortObject(source[key]);
       target[key] = sortObject(target[key]);
     });
   }
+
+  return [source, target];
 };
 
 const getData = async (branchName, token) => {
@@ -43,7 +46,6 @@ const getData = async (branchName, token) => {
     console.error(error);
   }
 };
-
 
 const getBranchRef = async (branchName, token) => {
   return await axios.get(
@@ -153,9 +155,8 @@ const main = () => {
           // Get translations data
           const responseData = await getData(branch, token);
           if (responseData.data) {
-            const target = responseData.data;
             // Updates target keys
-            updateKeys(source, target);
+            const [_, target] = updateAndSortKeys(source, responseData.data);
             const responseBranchRef = await getBranchRef(branch, token);
             if (responseBranchRef.data) {
               const branchRefSHA = responseBranchRef.data.object.sha;
