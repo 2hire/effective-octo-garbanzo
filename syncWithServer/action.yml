@@ -1,18 +1,27 @@
 name: 'Sync with server'
 description: 'Syncing translations with server'
 inputs:
-  app-info:
-    description: 'Apps list'
+  owner:
+    description: 'Repo owner'
+    required: true
+  repo:
+    description: 'Repository containing the json file to update'
     required: true
   current-branch:
-    description: 'Current branch name'
+    description: 'Current branch'
+    required: true
+  file-path:
+    description: 'Path to the file'
+    required: true
+  app-info:
+    description: 'Apps list'
     required: true
   token:
     description: 'token'
     required: true
 outputs:
-  downloaded-translations:
-    description: 'Translations to be saved'
+  downloaded-json-file:
+    description: 'Json file to be saved'
     
 runs:
   using: 'node16'

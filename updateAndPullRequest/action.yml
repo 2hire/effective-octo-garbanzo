@@ -1,6 +1,12 @@
-name: 'Update translations and create a pull request'
-description: 'Updates current translations and creates a pull request'
+name: 'Update json files and create a pull request'
+description: 'Updates current json files and creates a pull request'
 inputs:
+  owner:
+    description: 'Repo owner'
+    required: true
+  repo:
+    description: 'Repository containing the json file to update'
+    required: true
   file-path:
     description: 'Path to the file'
     required: true

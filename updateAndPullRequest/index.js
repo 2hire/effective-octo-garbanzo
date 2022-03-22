@@ -32,10 +32,10 @@ const updateAndSortKeys = (source, target) => {
   return [source, target];
 };
 
-const getData = async (branchName, token) => {
+const getRawJsonData = async (owner, repo, branchName, path, token) => {
   try {
     return await axios.get(
-      `https://raw.githubusercontent.com/Khalester/TestGithubActions/${branchName}/settings/translations.json`,
+      `https://raw.githubusercontent.com/${owner}/${repo}/${branchName}/${path}`,
       {
         headers: {
           Authorization: `token ${token}`,
@@ -47,9 +47,9 @@ const getData = async (branchName, token) => {
   }
 };
 
-const getBranchRef = async (branchName, token) => {
+const getBranchRef = async (owner, repo, branchName, token) => {
   return await axios.get(
-    `https://api.github.com/repos/Khalester/TestGithubActions/git/ref/heads/${branchName}`,
+    `https://api.github.com/repos/${owner}/${repo}/git/ref/heads/${branchName}`,
     {
       headers: {
         Authorization: `token ${token}`,
@@ -59,9 +59,9 @@ const getBranchRef = async (branchName, token) => {
   );
 };
 
-const createBranch = async (newBranchName, sha, token) => {
+const createBranch = async (owner, repo, newBranchName, sha, token) => {
   return await axios.post(
-    `https://api.github.com/repos/Khalester/TestGithubActions/git/refs`,
+    `https://api.github.com/repos/${owner}/${repo}/git/refs`,
     JSON.stringify({
       ref: `refs/heads/${newBranchName}`,
       sha,
@@ -75,9 +75,9 @@ const createBranch = async (newBranchName, sha, token) => {
   );
 };
 
-const getTranslationsFile = async (branchName, token) => {
+const getJsonFileInfo = async (owner, repo, branchName, path, token) => {
   return await axios.get(
-    `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.json?ref=${branchName}`,
+    `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branchName}`,
     {
       headers: {
         Authorization: `token ${token}`,
@@ -87,12 +87,20 @@ const getTranslationsFile = async (branchName, token) => {
   );
 };
 
-const updateTranslations = async (content, sha, branchName, token) => {
+const updateJson = async (
+  owner,
+  repo,
+  branchName,
+  path,
+  content,
+  sha,
+  token
+) => {
   try {
     return await axios.put(
-      `https://api.github.com/repos/Khalester/TestGithubActions/contents/settings/translations.json`,
+      `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
       JSON.stringify({
-        message: "[Translation Sync] Updated translations [skip ci]",
+        message: "[Garbanzo] Updated target json [skip ci]",
         content: Buffer.from(
           JSON.stringify(content, null, 2),
           "utf-8"
@@ -112,14 +120,14 @@ const updateTranslations = async (content, sha, branchName, token) => {
   }
 };
 
-const createPullRequest = async (head, base, token) => {
+const createPullRequest = async (owner, repo, head, base, token) => {
   try {
     return await axios.post(
-      "https://api.github.com/repos/Khalester/TestGithubActions/pulls",
+      `https://api.github.com/repos/${owner}/${repo}/pulls`,
       JSON.stringify({
         head,
         base,
-        title: `[Translation Sync] Merging ${head} to ${base}`,
+        title: `[Garbanzo] Merging ${head} to ${base}`,
       }),
       {
         headers: {
@@ -136,6 +144,8 @@ const createPullRequest = async (head, base, token) => {
 const main = () => {
   try {
     // Getting inputs from action
+    const owner = core.getInput("owner");
+    const repo = core.getInput("repo");
     const path = core.getInput("file-path");
     const token = core.getInput("token");
     const appInfo = JSON.parse(core.getInput("app-info"));
@@ -150,30 +160,47 @@ const main = () => {
       appInfo.forEach(async (element) => {
         try {
           const branch = element.branchName;
-          const translationBranch = branch.split("/")[0] + "-translations";
+          const garbanzo = branch.split("/")[0] + "-garbanzo";
 
-          // Get translations data
-          const responseData = await getData(branch, token);
+          // Get json data
+          const responseData = await getRawJsonData(
+            owner,
+            repo,
+            branch,
+            path,
+            token
+          );
           if (responseData.data) {
             // Updates target keys
             const [_, target] = updateAndSortKeys(source, responseData.data);
-            const responseBranchRef = await getBranchRef(branch, token);
+            const responseBranchRef = await getBranchRef(
+              owner,
+              repo,
+              branch,
+              token
+            );
             if (responseBranchRef.data) {
               const branchRefSHA = responseBranchRef.data.object.sha;
-              await createBranch(translationBranch, branchRefSHA, token);
-              const responseTranslationsFile = await getTranslationsFile(
-                translationBranch,
+              await createBranch(owner, repo, garbanzo, branchRefSHA, token);
+              const responseJsonFile = await getJsonFileInfo(
+                owner,
+                repo,
+                garbanzo,
+                path,
                 token
               );
-              if (responseTranslationsFile.data) {
-                const translationsFileSHA = responseTranslationsFile.data.sha;
-                await updateTranslations(
+              if (responseJsonFile.data) {
+                const jsonFileSHA = responseJsonFile.data.sha;
+                await updateJson(
+                  owner,
+                  repo,
+                  garbanzo,
+                  path,
                   target,
-                  translationsFileSHA,
-                  translationBranch,
+                  jsonFileSHA,
                   token
                 );
-                await createPullRequest(translationBranch, branch, token);
+                await createPullRequest(owner, repo, garbanzo, branch, token);
               }
             }
           }

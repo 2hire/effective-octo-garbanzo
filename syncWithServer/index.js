@@ -1,10 +1,10 @@
 const core = require("@actions/core");
 const axios = require("axios");
 
-const getData = async (token) => {
+const getRawJsonData = async (owner, repo, branchName, path, token) => {
   try {
     return await axios.get(
-      `https://raw.githubusercontent.com/Khalester/TestGithubActions/appName1/develop/settings/translations.json`,
+      `https://raw.githubusercontent.com/${owner}/${repo}/${branchName}/${path}`,
       {
         headers: {
           Authorization: `token ${token}`,
@@ -16,24 +16,27 @@ const getData = async (token) => {
   }
 };
 
-const updateServerTranslations = () => console.log('Updating server translations');
+const updateServerJsonFile = () => console.log('Updating server translations');
 
 const main = async () => {
   try {
-    const appInfo = JSON.parse(core.getInput("app-info"));
+    const owner = core.getInput("owner");
+    const repo = core.getInput("repo");
     const currentBranchName = core.getInput("current-branch");
+    const path = core.getInput("file-path");
+    const token = core.getInput("token");
+    const appInfo = JSON.parse(core.getInput("app-info"));
     console.log(currentBranchName);
     console.log(
       appInfo.find((branch) => branch.branchName === currentBranchName)
     );
-    const token = core.getInput("token");
 
-    updateServerTranslations();
+    updateServerJsonFile();
 
-    const data = await getData(token);
+    const data = await getRawJsonData(owner, repo, currentBranchName, path, token);
 
     core.setOutput(
-      "downloaded-translations",
+      "downloaded-json-file",
       JSON.stringify(data.data, null, 2)
     );
   } catch (error) {
