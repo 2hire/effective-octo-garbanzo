@@ -1,5 +1,5 @@
 name: 'Sync with server'
-description: 'Syncing translations with server'
+description: 'Syncing files with server'
 inputs:
   owner:
     description: 'Repo owner'
