@@ -1,1 +1,1 @@
-# effective-octo-garbanzo (2hire's Translation Sync utility scripts)
+# effective-octo-garbanzo - JSON Files updater
