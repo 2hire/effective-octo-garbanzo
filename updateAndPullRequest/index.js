@@ -172,7 +172,7 @@ const main = () => {
       appInfo.forEach(async (element) => {
         try {
           const branch = element.branchName;
-          const garbanzo = branch.split("/")[0] + "-garbanzo";
+          const garbanzoBranch = branch.split("/")[0] + "-garbanzo";
 
           // Get json data
           const responseData = await getRawJsonData(
@@ -193,11 +193,11 @@ const main = () => {
             );
             if (responseBranchRef.data) {
               const branchRefSHA = responseBranchRef.data.object.sha;
-              await createBranch(owner, repo, garbanzo, branchRefSHA, token);
+              await createBranch(owner, repo, garbanzoBranch, branchRefSHA, token);
               const responseJsonFile = await getJsonFileInfo(
                 owner,
                 repo,
-                garbanzo,
+                garbanzoBranch,
                 path,
                 token
               );
@@ -206,13 +206,13 @@ const main = () => {
                 await updateJson(
                   owner,
                   repo,
-                  garbanzo,
+                  garbanzoBranch,
                   path,
                   target,
                   jsonFileSHA,
                   token
                 );
-                await createPullRequest(owner, repo, garbanzo, branch, token);
+                await createPullRequest(owner, repo, garbanzoBranch, branch, token);
               }
             }
           }
