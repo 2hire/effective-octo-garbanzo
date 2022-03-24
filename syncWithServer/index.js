@@ -141,7 +141,7 @@ const main = async () => {
     //     })
     // });
 
-    core.setOutput("downloaded-json-file", JSON.stringify(JSON.stringify(target)));
+    core.setOutput("downloaded-json-file", JSON.stringify(target, null, 2));
   } catch (error) {
     core.setFailed(error.message);
   }
