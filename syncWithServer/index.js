@@ -111,7 +111,6 @@ const main = async () => {
     const bearerToken = thisBranch.bearerToken;
 
     const headers = {
-      Accept: "application/json",
       Authorization: `Bearer ${bearerToken}`,
       "Content-type": "application/json",
       "X-SERVICE-TOKEN": serviceToken,
