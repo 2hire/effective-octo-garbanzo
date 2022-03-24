@@ -118,9 +118,9 @@ const main = async () => {
 
     console.log(thisBranch)
 
-    const data = await Adapter.getServerTranslation(endpoint, headers);
-    console.log(data);
-    const target = TranslationHelper.toNamedKey(data.data.data);
+    const response = await Adapter.getServerTranslation(endpoint, headers);
+    console.log(response.data.data);
+    const target = TranslationHelper.toNamedKey(response.data.data);
 
     // fs.readFile(path, "utf-8", (error, file) => {
     //   if (error) {
