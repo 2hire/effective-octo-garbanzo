@@ -38,7 +38,7 @@ const Utils = {
       sourceKeys.forEach((key) => {
         if (!target.hasOwnProperty(key)) target[key] = source[key];
         else {
-          const [sKeys, tKeys] = updateAndSortKeys(source[key], target[key]);
+          const [sKeys, tKeys] = Utils.updateAndSortKeys(source[key], target[key]);
           source[key] = sKeys;
           target[key] = tKeys;
         }
