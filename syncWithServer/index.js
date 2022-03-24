@@ -117,7 +117,7 @@ const main = async () => {
       "X-SERVICE-TOKEN": serviceToken,
     };
 
-    const data = await getServerTranslation(endpoint, headers);
+    const data = await Adapter.getServerTranslation(endpoint, headers);
     const target = TranslationHelper.toNamedKey(data.data);
 
     // fs.readFile(path, "utf-8", (error, file) => {
