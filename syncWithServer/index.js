@@ -117,10 +117,7 @@ const main = async () => {
       "X-SERVICE-TOKEN": serviceToken,
     };
 
-    console.log(thisBranch)
-
     const response = await Adapter.getServerTranslation(endpoint, headers);
-    console.log(response.data.data);
     const target = TranslationHelper.toNamedKey(response.data.data);
 
     fs.readFile(path, "utf-8", (error, file) => {
@@ -130,21 +127,16 @@ const main = async () => {
       const source = JSON.parse(file);
       const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
       if (stringQueryParams)
-        // Adapter.setServerTranslation(
-        //   diffToSend,
-        //   `${endpoint}?${stringQueryParams}`,
-        //   headers
-        // );
-        console.log({
+        Adapter.setServerTranslation(
           diffToSend,
-          endpoint: `${endpoint}?${stringQueryParams}`,
+          `${endpoint}?${stringQueryParams}`,
           headers
-        })
+        );
     });
 
     fs.writeFile(backupFilePath, JSON.stringify(target), (err) => {
       if (err) console.error(err);
-    })
+    });
   } catch (error) {
     core.setFailed(error.message);
   }
