@@ -10,6 +10,9 @@ inputs:
   file-path:
     description: 'Path to the file'
     required: true
+  backup-file-path:
+    description: 'Backup file path'
+    required: true
   current-branch:
     descrption: 'Branch name'
     required: true
