@@ -1,44 +1,145 @@
 const core = require("@actions/core");
 const axios = require("axios");
+const fs = require("fs");
 
-const getRawJsonData = async (owner, repo, branchName, path, token) => {
-  try {
-    return await axios.get(
-      `https://raw.githubusercontent.com/${owner}/${repo}/${branchName}/${path}`,
-      {
-        headers: {
-          Authorization: `token ${token}`,
-        },
-      }
-    );
-  } catch (error) {
-    console.error(error);
-  }
+const Adapter = {
+  getServerTranslation: async (endpoint, headers) => {
+    try {
+      return await axios.get(endpoint, {
+        headers,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  setServerTranslation: async (translationObject, endpoint, headers) => {
+    try {
+      return await axios.post(endpoint, JSON.stringify(translationObject), {
+        headers,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };
 
-const updateServerJsonFile = () => console.log('Updating server translations');
+const TranslationHelper = {
+  toNamedKey: (keyValueStore) => {
+    if (!keyValueStore) {
+      console.log("Not valid input");
+      return;
+    }
+    const originalBaseLanguages = keyValueStore.base;
+    if (typeof originalBaseLanguages === "undefined") {
+      console.log("Base languages were not available");
+      return null;
+    }
+    const originalSpecificLanguages = keyValueStore.specific;
+    if (typeof originalSpecificLanguages === "undefined") {
+      console.log("Specific languages were not available");
+      return null;
+    }
+
+    const mapLanguageObject = (original) => {
+      return Object.entries(original).reduce((acc, [key, value]) => {
+        acc[key] = value.reduce((acc, keyValueObject) => {
+          acc[keyValueObject.key] = keyValueObject.value;
+          return acc;
+        }, {});
+        return acc;
+      }, {});
+    };
+
+    const baseNamedKey = mapLanguageObject(originalBaseLanguages);
+    let specificNamedKey = {};
+    Object.entries(originalSpecificLanguages).forEach(([key, value]) => {
+      specificNamedKey[key] = mapLanguageObject(value);
+    });
+    return { base: baseNamedKey, ...specificNamedKey };
+  },
+
+  toKeyValue: (namedKey) => {
+    const mapLanguageObject = (original) => {
+      return Object.entries(original).reduce((acc, [key, value]) => {
+        acc[key] = Object.entries(value).map(
+          ([translationKey, translationValue]) => {
+            return { key: translationKey, value: translationValue };
+          }
+        );
+        return acc;
+      }, {});
+    };
+
+    return {
+      specific: Object.entries(namedKey).reduce((acc, [key, value]) => {
+        if (key !== "base" && key !== "timestamp") {
+          acc[key] = mapLanguageObject(value);
+        }
+        return acc;
+      }, {}),
+      base: mapLanguageObject(namedKey.base),
+    };
+  },
+};
+
+const diff = (source, target) => {
+  if (typeof source === "object" && !Array.isArray(source) && source !== null)
+    return Object.keys(source).reduce((acc, key) => {
+      if (!target.hasOwnProperty(key)) acc[key] = source[key];
+      else {
+        const result = diff(source[key], target[key]);
+        if (result && Object.keys(result).length > 0) {
+          acc[key] = result;
+        }
+      }
+      return acc;
+    }, {});
+};
 
 const main = async () => {
   try {
-    const owner = core.getInput("owner");
-    const repo = core.getInput("repo");
-    const currentBranchName = core.getInput("current-branch");
+    const endpoint = core.getInput("endpoint");
+    const stringQueryParams = core.getInput("query-params");
     const path = core.getInput("file-path");
-    const token = core.getInput("token");
+    const currentBranchName = core.getInput("current-branch");
     const appInfo = JSON.parse(core.getInput("app-info"));
-    console.log(currentBranchName);
-    console.log(
-      appInfo.find((branch) => branch.branchName === currentBranchName)
+
+    const thisBranch = appInfo.find(
+      (branch) => branch.branchName === currentBranchName
     );
+    const serviceToken = thisBranch.serviceToken;
+    const bearerToken = thisBranch.bearerToken;
 
-    updateServerJsonFile();
+    const headers = {
+      Accept: "application/json",
+      Authorization: `Bearer ${bearerToken}`,
+      "Content-type": "application/json",
+      "X-SERVICE-TOKEN": serviceToken,
+    };
 
-    const data = await getRawJsonData(owner, repo, currentBranchName, path, token);
+    const data = await getServerTranslation(endpoint, headers);
+    const target = TranslationHelper.toNamedKey(data.data);
 
-    core.setOutput(
-      "downloaded-json-file",
-      JSON.stringify(data.data, null, 2)
-    );
+    // fs.readFile(path, "utf-8", (error, file) => {
+    //   if (error) {
+    //     return console.error(error);
+    //   }
+    //   const source = JSON.parse(file);
+    //   const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
+    //   if (stringQueryParams)
+    //     // Adapter.setServerTranslation(
+    //     //   diffToSend,
+    //     //   `${endpoint}?${stringQueryParams}`,
+    //     //   headers
+    //     // );
+    //     console.log({
+    //       diffToSend,
+    //       endpoint: `${endpoint}?${stringQueryParams}`,
+    //       headers
+    //     })
+    // });
+
+    core.setOutput("downloaded-json-file", JSON.stringify(target));
   } catch (error) {
     core.setFailed(error.message);
   }

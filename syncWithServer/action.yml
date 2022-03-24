@@ -1,23 +1,20 @@
 name: 'Sync with server'
 description: 'Syncing files with server'
 inputs:
-  owner:
-    description: 'Repo owner'
+  endpoint:
+    description: 'Endpoint'
     required: true
-  repo:
-    description: 'Repository containing the json file to update'
-    required: true
-  current-branch:
-    description: 'Current branch'
-    required: true
+  query-params:
+    description: 'Query params'
+    required: false
   file-path:
     description: 'Path to the file'
     required: true
+  current-branch:
+    descrption: 'Branch name'
+    required: true
   app-info:
     description: 'Apps list'
-    required: true
-  token:
-    description: 'token'
     required: true
 outputs:
   downloaded-json-file:
