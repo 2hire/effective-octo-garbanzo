@@ -101,6 +101,7 @@ const main = async () => {
     const endpoint = core.getInput("endpoint");
     const stringQueryParams = core.getInput("query-params");
     const path = core.getInput("file-path");
+    const backupFilePath = core.getInput("backup-file-path");
     const currentBranchName = core.getInput("current-branch");
     const appInfo = JSON.parse(core.getInput("app-info"));
 
@@ -141,7 +142,9 @@ const main = async () => {
     //     })
     // });
 
-    core.setOutput("downloaded-json-file", JSON.stringify(target, null, 2));
+    fs.writeFile(backupFilePath, JSON.stringify(target), (err) => {
+      if (err) console.error(err);
+    })
   } catch (error) {
     core.setFailed(error.message);
   }
