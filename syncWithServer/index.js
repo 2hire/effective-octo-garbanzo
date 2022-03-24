@@ -117,6 +117,8 @@ const main = async () => {
       "X-SERVICE-TOKEN": serviceToken,
     };
 
+    console.log(thisBranch)
+
     const data = await Adapter.getServerTranslation(endpoint, headers);
     console.log(data);
     const target = TranslationHelper.toNamedKey(data.data);
