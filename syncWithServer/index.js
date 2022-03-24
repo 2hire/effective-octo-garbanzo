@@ -118,6 +118,7 @@ const main = async () => {
     };
 
     const data = await Adapter.getServerTranslation(endpoint, headers);
+    console.log(data);
     const target = TranslationHelper.toNamedKey(data.data);
 
     // fs.readFile(path, "utf-8", (error, file) => {
