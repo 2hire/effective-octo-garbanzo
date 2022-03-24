@@ -123,24 +123,24 @@ const main = async () => {
     console.log(response.data.data);
     const target = TranslationHelper.toNamedKey(response.data.data);
 
-    // fs.readFile(path, "utf-8", (error, file) => {
-    //   if (error) {
-    //     return console.error(error);
-    //   }
-    //   const source = JSON.parse(file);
-    //   const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
-    //   if (stringQueryParams)
-    //     // Adapter.setServerTranslation(
-    //     //   diffToSend,
-    //     //   `${endpoint}?${stringQueryParams}`,
-    //     //   headers
-    //     // );
-    //     console.log({
-    //       diffToSend,
-    //       endpoint: `${endpoint}?${stringQueryParams}`,
-    //       headers
-    //     })
-    // });
+    fs.readFile(path, "utf-8", (error, file) => {
+      if (error) {
+        return console.error(error);
+      }
+      const source = JSON.parse(file);
+      const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
+      if (stringQueryParams)
+        // Adapter.setServerTranslation(
+        //   diffToSend,
+        //   `${endpoint}?${stringQueryParams}`,
+        //   headers
+        // );
+        console.log({
+          diffToSend,
+          endpoint: `${endpoint}?${stringQueryParams}`,
+          headers
+        })
+    });
 
     fs.writeFile(backupFilePath, JSON.stringify(target), (err) => {
       if (err) console.error(err);
