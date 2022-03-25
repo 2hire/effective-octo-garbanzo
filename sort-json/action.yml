@@ -1,5 +1,5 @@
-name: 'Update json files and create a pull request'
-description: 'Updates current json files and creates a pull request'
+name: 'Sort json object'
+description: 'Sort json object keys'
 inputs:
   owner:
     description: 'Repo owner'
@@ -7,11 +7,11 @@ inputs:
   repo:
     description: 'Repository containing the json file to update'
     required: true
+  current-branch:
+    description: 'Branch name'
+    required: true
   file-path:
     description: 'Path to the file'
-    required: true
-  app-info:
-    description: 'List of branches, should be a json with key [branchName]'
     required: true
   token:
     description: 'token'

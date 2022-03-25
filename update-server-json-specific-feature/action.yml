@@ -1,5 +1,5 @@
-name: 'Sync with server'
-description: 'Syncing files with server'
+name: 'Updates server file (specific feature)'
+description: 'Updates server file with recently added json keys'
 inputs:
   endpoint:
     description: 'Endpoint'
@@ -14,14 +14,11 @@ inputs:
     description: 'Backup file path'
     required: true
   current-branch:
-    descrption: 'Branch name'
+    description: 'Branch name'
     required: true
   app-info:
     description: 'Apps list'
     required: true
-outputs:
-  downloaded-json-file:
-    description: 'Json file to be saved'
     
 runs:
   using: 'node16'

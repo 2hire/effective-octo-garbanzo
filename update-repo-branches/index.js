@@ -18,17 +18,7 @@ const getRawJsonData = async (owner, repo, branchName, path, token) => {
 };
 
 const Utils = {
-  sortObject: (object) => {
-    if (typeof object === "object" && !Array.isArray(object) && object !== null)
-      return Object.keys(object)
-        .sort()
-        .reduce((obj, key) => {
-          obj[key] = object[key];
-          return obj;
-        }, {});
-    return object;
-  },
-  updateAndSortKeys: (source, target) => {
+  updateKeys: (source, target) => {
     if (
       typeof source === "object" &&
       !Array.isArray(source) &&
@@ -38,13 +28,8 @@ const Utils = {
       sourceKeys.forEach((key) => {
         if (!target.hasOwnProperty(key)) target[key] = source[key];
         else {
-          const [sKeys, tKeys] = Utils.updateAndSortKeys(source[key], target[key]);
-          source[key] = sKeys;
-          target[key] = tKeys;
+          Utils.updateKeys(source[key], target[key]);
         }
-        // sorts children keys
-        source[key] = Utils.sortObject(source[key]);
-        target[key] = Utils.sortObject(target[key]);
       });
     }
 
@@ -195,10 +180,7 @@ const main = () => {
           );
           if (responseData.data) {
             // Updates target keys
-            const [_, target] = Utils.updateAndSortKeys(
-              source,
-              responseData.data
-            );
+            const [_, target] = Utils.updateKeys(source, responseData.data);
             const responseBranchRef = await GitHubAPI.Branch.getRef(
               owner,
               repo,
