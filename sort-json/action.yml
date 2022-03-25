@@ -1,20 +1,8 @@
 name: 'Sort json object'
 description: 'Sort json object keys'
 inputs:
-  owner:
-    description: 'Repo owner'
-    required: true
-  repo:
-    description: 'Repository containing the json file to update'
-    required: true
-  current-branch:
-    description: 'Branch name'
-    required: true
   file-path:
     description: 'Path to the file'
-    required: true
-  token:
-    description: 'token'
     required: true
 runs:
   using: 'node16'
