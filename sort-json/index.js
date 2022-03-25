@@ -80,7 +80,7 @@ const main = () => {
     const path = core.getInput("file-path");
     const token = core.getInput("token");
 
-    fs.readFile(path, "utf-8", (error, data) => {
+    fs.readFile(path, "utf-8", async (error, data) => {
       if (error) {
         return console.error(error);
       }
