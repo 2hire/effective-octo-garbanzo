@@ -108,6 +108,10 @@ const main = async () => {
     const thisBranch = appInfo.find(
       (branch) => branch.branchName === currentBranchName
     );
+
+    // If branch not found: exit
+    if (!thisBranch) return;
+
     const serviceToken = thisBranch.serviceToken;
     const bearerToken = thisBranch.bearerToken;
 
