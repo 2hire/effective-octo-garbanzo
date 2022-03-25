@@ -12,7 +12,7 @@ const Utils = {
       return Object.keys(object)
         .sort()
         .reduce((acc, key) => {
-          acc[key] = sort(object[key]);
+          acc[key] = Utils.sort(object[key]);
           return acc;
         }, {});
     }
