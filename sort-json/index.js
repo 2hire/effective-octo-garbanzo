@@ -100,7 +100,7 @@ const main = () => {
           repo,
           currentBranchName,
           path,
-          object,
+          Utils.sort(object),
           jsonFileSHA,
           token
         );
