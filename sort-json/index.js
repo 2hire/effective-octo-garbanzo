@@ -29,7 +29,7 @@ const main = () => {
       }
       const object = JSON.parse(data);
 
-      fs.writeFile(path, Utils.sort(object), (error) => {
+      fs.writeFile(path, JSON.stringify(Utils.sort(object), null, 2), (error) => {
         if (error) console.error(error);
       });
     });
