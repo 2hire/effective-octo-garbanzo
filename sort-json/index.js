@@ -28,10 +28,16 @@ const main = () => {
         return console.error(error);
       }
       const object = JSON.parse(data);
-
-      fs.writeFile(path, JSON.stringify(Utils.sort(object), null, 2), (error) => {
-        if (error) console.error(error);
-      });
+      let dataToWrite = JSON.stringify(Utils.sort(object), null, 2);
+      if (dataToWrite.substring(dataToWrite.length - 1) !== "\n")
+        dataToWrite += "\n";
+      fs.writeFile(
+        path,
+        dataToWrite,
+        (error) => {
+          if (error) console.error(error);
+        }
+      );
     });
   } catch (error) {
     core.setFailed(error.message);
