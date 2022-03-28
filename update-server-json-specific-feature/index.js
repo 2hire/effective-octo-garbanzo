@@ -41,13 +41,19 @@ const TranslationHelper = {
     }
 
     const mapLanguageObject = (original) => {
-      return Object.entries(original).reduce((acc, [key, value]) => {
-        acc[key] = value.reduce((acc, keyValueObject) => {
-          acc[keyValueObject.key] = keyValueObject.value;
+      if (
+        typeof original === "object" &&
+        !Array.isArray(original) &&
+        original !== null
+      )
+        return Object.entries(original).reduce((acc, [key, value]) => {
+          acc[key] = value.reduce((acc, keyValueObject) => {
+            acc[keyValueObject.key] = keyValueObject.value;
+            return acc;
+          }, {});
           return acc;
         }, {});
-        return acc;
-      }, {});
+      return {};
     };
 
     const baseNamedKey = mapLanguageObject(originalBaseLanguages);
