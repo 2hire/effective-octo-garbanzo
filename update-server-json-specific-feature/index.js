@@ -60,14 +60,20 @@ const TranslationHelper = {
 
   toKeyValue: (namedKey) => {
     const mapLanguageObject = (original) => {
-      return Object.entries(original).reduce((acc, [key, value]) => {
-        acc[key] = Object.entries(value).map(
-          ([translationKey, translationValue]) => {
-            return { key: translationKey, value: translationValue };
-          }
-        );
-        return acc;
-      }, {});
+      if (
+        typeof original === "object" &&
+        !Array.isArray(original) &&
+        original !== null
+      )
+        return Object.entries(original).reduce((acc, [key, value]) => {
+          acc[key] = Object.entries(value).map(
+            ([translationKey, translationValue]) => {
+              return { key: translationKey, value: translationValue };
+            }
+          );
+          return acc;
+        }, {});
+      return {};
     };
 
     return {
