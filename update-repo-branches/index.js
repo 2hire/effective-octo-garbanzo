@@ -104,7 +104,7 @@ const GitHubAPI = {
         return await axios.put(
           `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
           JSON.stringify({
-            message: "[Garbanzo] Updated target json [skip ci]",
+            message: "feat: [Garbanzo] Updated target json",
             content: Buffer.from(
               JSON.stringify(content, null, 2),
               "utf-8"
