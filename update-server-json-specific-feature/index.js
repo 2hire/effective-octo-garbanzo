@@ -117,7 +117,7 @@ const main = async () => {
     const secrets = JSON.parse(core.getInput("secrets-context"));
     const secretSuffix = core.getInput("secret-suffix");
 
-    const thisBranch = Object.entries(secrets).find(
+    const [_, thisBranch] = Object.entries(secrets).find(
       ([key, value]) =>
         key.endsWith(secretSuffix) &&
         JSON.parse(value).branchName === currentBranchName
