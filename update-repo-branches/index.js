@@ -160,6 +160,12 @@ const main = () => {
 
     console.log("SECRETS:", secrets);
 
+    Object.keys(secrets).forEach((secret) => {
+      if (secret.endsWith("APP_INFO")) {
+        console.log(secret);
+      }
+    })
+
     // // Read file from path
     // fs.readFile(path, "utf-8", (error, data) => {
     //   if (error) {
