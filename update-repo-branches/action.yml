@@ -13,6 +13,9 @@ inputs:
   secrets-context:
     description: 'Secrets context'
     required: true
+  secret-suffix:
+    description: 'Secret suffix to identify the one that will be used'
+    required: true
   token:
     description: 'Token'
     required: true
