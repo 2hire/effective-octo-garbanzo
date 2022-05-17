@@ -31,6 +31,7 @@ const main = () => {
       let dataToWrite = JSON.stringify(Utils.sort(object), null, 2);
       if (dataToWrite.substring(dataToWrite.length - 1) !== "\n")
         dataToWrite += "\n";
+      console.log(dataToWrite);
       fs.writeFile(
         path,
         dataToWrite,
