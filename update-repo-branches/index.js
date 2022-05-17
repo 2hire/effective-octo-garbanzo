@@ -185,32 +185,15 @@ const main = () => {
               const selectedLanguages = parsedValue.selectedLanguages;
 
               // filtering by selected languages
-              source.base = Object.entries(source.base).reduce(
-                (acc, [key, value]) => {
-                  if (selectedLanguages.includes(key))
-                    acc[key] = source.base[key];
-                  return acc;
-                },
-                {}
-              );
-
-              // filtering by selected languages
-              if (source.specific) {
-                source.specific = Object.keys(source.specific).reduce(
-                  (acc, key) => {
-                    acc[key] = Object.keys(source.specific[key]).reduce(
-                      (accLn, keyLn) => {
-                        if (selectedLanguages.includes(keyLn))
-                          accLn[keyLn] = source.specific[key][keyLn];
-                        return accLn;
-                      },
-                      {}
-                    );
+              Object.keys(source).forEach((sourceKey) => {
+                if (sourceKey === "base" || !isNaN(Number(sourceKey))) {
+                  // filtering base by selected languages
+                  source[sourceKey] = Object.keys(source[sourceKey]).reduce((acc, key) => {
+                    if (selectedLanguages.includes(key)) acc[key] = source[sourceKey][key];
                     return acc;
-                  },
-                  {}
-                );
-              }
+                  }, {});
+                }
+              });
 
               // Updates target keys
               const [_, target] = Utils.updateKeys(source, responseData.data);
