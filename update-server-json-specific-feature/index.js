@@ -153,12 +153,14 @@ const main = async () => {
       Object.keys(source).forEach((sourceKey) => {
         if (sourceKey === "base" || !isNaN(Number(sourceKey))) {
           // filtering base by selected languages
-          k[sourceKey] = Object.keys(k[sourceKey]).reduce((acc, key) => {
-            if (selectedLanguages.includes(key)) acc[key] = k[sourceKey][key];
+          source[sourceKey] = Object.keys(source[sourceKey]).reduce((acc, key) => {
+            if (selectedLanguages.includes(key)) acc[key] = source[sourceKey][key];
             return acc;
           }, {});
         }
       });
+
+      console.log(source);
 
       const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
 
