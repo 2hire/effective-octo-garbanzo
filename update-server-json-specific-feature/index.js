@@ -117,71 +117,72 @@ const main = async () => {
     const secrets = JSON.parse(core.getInput("secrets-context"));
     const secretSuffix = core.getInput("secret-suffix");
 
-    const [_, thisBranch] = Object.entries(secrets).find(
+    const [_, thisBranchUnparsed] = Object.entries(secrets).find(
       ([key, value]) =>
         key.endsWith(secretSuffix) &&
         JSON.parse(value).branchName === currentBranchName
     );
 
-    console.log(thisBranch);
-
+    
     // If branch not found: exit
-    if (!thisBranch) return;
+    if (!thisBranchUnparsed) return;
+    
+    const thisBranch = JSON.parse(thisBranchUnparsed);
 
-    // const serviceToken = thisBranch.serviceToken;
-    // const bearerToken = thisBranch.bearerToken;
-    // const selectedLanguages = thisBranch.selectedLanguages;
+    const serviceToken = thisBranch.serviceToken;
+    const bearerToken = thisBranch.bearerToken;
+    const selectedLanguages = thisBranch.selectedLanguages;
 
-    // const headers = {
-    //   Authorization: `Bearer ${bearerToken}`,
-    //   "Content-type": "application/json",
-    //   "X-SERVICE-TOKEN": serviceToken,
-    // };
+    const headers = {
+      Authorization: `Bearer ${bearerToken}`,
+      "Content-type": "application/json",
+      "X-SERVICE-TOKEN": serviceToken,
+    };
 
-    // const response = await Adapter.getServerTranslation(endpoint, headers);
-    // const target = TranslationHelper.toNamedKey(response.data.data);
+    const response = await Adapter.getServerTranslation(endpoint, headers);
+    const target = TranslationHelper.toNamedKey(response.data.data);
 
-    // fs.readFile(path, "utf-8", (error, file) => {
-    //   if (error) {
-    //     return console.error(error);
-    //   }
-    //   const source = JSON.parse(file);
+    fs.readFile(path, "utf-8", (error, file) => {
+      if (error) {
+        return console.error(error);
+      }
+      const source = JSON.parse(file);
 
-    //   // filtering by selected languages
-    //   source.base = Object.entries(source.base).reduce((acc, [key, value]) => {
-    //     if (selectedLanguages.includes(key)) acc[key] = source.base[key];
-    //     return acc;
-    //   }, {});
+      // filtering by selected languages
+      source.base = Object.entries(source.base).reduce((acc, [key, value]) => {
+        if (selectedLanguages.includes(key)) acc[key] = source.base[key];
+        return acc;
+      }, {});
 
-    //   // filtering by selected languages
-    //   if (source.specific) {
-    //     source.specific = Object.keys(source.specific).reduce((acc, key) => {
-    //       acc[key] = Object.keys(source.specific[key]).reduce(
-    //         (accLn, keyLn) => {
-    //           if (selectedLanguages.includes(keyLn))
-    //             accLn[keyLn] = source.specific[key][keyLn];
-    //           return accLn;
-    //         },
-    //         {}
-    //       );
-    //       return acc;
-    //     }, {});
-    //   }
+      // filtering by selected languages
+      if (source.specific) {
+        source.specific = Object.keys(source.specific).reduce((acc, key) => {
+          acc[key] = Object.keys(source.specific[key]).reduce(
+            (accLn, keyLn) => {
+              if (selectedLanguages.includes(keyLn))
+                accLn[keyLn] = source.specific[key][keyLn];
+              return accLn;
+            },
+            {}
+          );
+          return acc;
+        }, {});
+      }
 
-    //   const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
+      const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
 
-    //   console.log(diffToSend);
-    //   //
-    //   //   Adapter.setServerTranslation(
-    //   //     diffToSend,
-    //   //     `${endpoint}`,
-    //   //     headers
-    //   //   );
-    // });
+      console.log(diffToSend);
+      //
+      //   Adapter.setServerTranslation(
+      //     diffToSend,
+      //     `${endpoint}`,
+      //     headers
+      //   );
+    });
 
-    // fs.writeFile(backupFilePath, JSON.stringify(target), (err) => {
-    //   if (err) console.error(err);
-    // });
+    fs.writeFile(backupFilePath, JSON.stringify(target), (err) => {
+      if (err) console.error(err);
+    });
   } catch (error) {
     core.setFailed(error.message);
   }
