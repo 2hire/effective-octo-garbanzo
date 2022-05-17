@@ -156,9 +156,9 @@ const main = () => {
     const repo = core.getInput("repo");
     const path = core.getInput("file-path");
     const token = core.getInput("token");
-    const appInfo = JSON.parse(core.getInput("app-info"));
+    const secrets = JSON.parse(core.getInput("secrets-context"));
 
-    console.log("SECRETS:", appInfo);
+    console.log("SECRETS:", secrets);
 
     // // Read file from path
     // fs.readFile(path, "utf-8", (error, data) => {

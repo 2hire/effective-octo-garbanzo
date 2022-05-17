@@ -10,11 +10,11 @@ inputs:
   file-path:
     description: 'Path to the file'
     required: true
-  app-info:
-    description: 'List of branches, should be a json with key [branchName]'
+  secrets-context:
+    description: 'Secrets context'
     required: true
   token:
-    description: 'token'
+    description: 'Token'
     required: true
 runs:
   using: 'node16'
