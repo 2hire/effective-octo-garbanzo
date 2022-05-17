@@ -139,7 +139,7 @@ const main = async () => {
       "X-SERVICE-TOKEN": serviceToken,
     };
 
-    const response = await Adapter.getServerTranslation(endpoint, headers);
+    const response = await Adapter.getServerTranslation(endpoint.split('?')[0], headers);
     const target = TranslationHelper.toNamedKey(response.data.data);
 
     fs.readFile(path, "utf-8", (error, file) => {
@@ -148,13 +148,13 @@ const main = async () => {
       }
       const source = JSON.parse(file);
 
-      // filtering by selected languages
+      // filtering base by selected languages
       source.base = Object.entries(source.base).reduce((acc, [key, value]) => {
         if (selectedLanguages.includes(key)) acc[key] = source.base[key];
         return acc;
       }, {});
 
-      // filtering by selected languages
+      // filtering specific by selected languages
       if (source.specific) {
         source.specific = Object.keys(source.specific).reduce((acc, key) => {
           acc[key] = Object.keys(source.specific[key]).reduce(
