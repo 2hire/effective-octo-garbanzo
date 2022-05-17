@@ -112,7 +112,6 @@ const main = async () => {
   try {
     const dryRun = core.getInput("dry-run");
     const endpoint = core.getInput("endpoint");
-    const stringQueryParams = core.getInput("query-params");
     const path = core.getInput("file-path");
     const backupFilePath = core.getInput("backup-file-path");
     const currentBranchName = core.getInput("current-branch");
@@ -171,10 +170,10 @@ const main = async () => {
       const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
 
       if (dryRun) console.log(diffToSend);
-      else if (stringQueryParams)
+      else 
         Adapter.setServerTranslation(
           diffToSend,
-          `${endpoint}?${stringQueryParams}`,
+          `${endpoint}`,
           headers
         );
     });

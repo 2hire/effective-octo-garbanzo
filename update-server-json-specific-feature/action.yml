@@ -7,9 +7,6 @@ inputs:
   endpoint:
     description: 'Endpoint'
     required: true
-  query-params:
-    description: 'Query params'
-    required: false
   file-path:
     description: 'Path to the file'
     required: true
