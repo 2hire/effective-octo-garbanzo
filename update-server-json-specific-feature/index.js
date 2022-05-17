@@ -123,10 +123,9 @@ const main = async () => {
         JSON.parse(value).branchName === currentBranchName
     );
 
-    
     // If branch not found: exit
     if (!thisBranchUnparsed) return;
-    
+
     const thisBranch = JSON.parse(thisBranchUnparsed);
 
     const serviceToken = thisBranch.serviceToken;
@@ -139,7 +138,10 @@ const main = async () => {
       "X-SERVICE-TOKEN": serviceToken,
     };
 
-    const response = await Adapter.getServerTranslation(endpoint.split('?')[0], headers);
+    const response = await Adapter.getServerTranslation(
+      endpoint.split("?")[0],
+      headers
+    );
     const target = TranslationHelper.toNamedKey(response.data.data);
 
     fs.readFile(path, "utf-8", (error, file) => {
@@ -149,27 +151,18 @@ const main = async () => {
       const source = JSON.parse(file);
 
       Object.keys(source).forEach((sourceKey) => {
-        if (sourceKey === 'base') {
-          // filtering base by selected languages
-          source[sourceKey] = Object.keys(source[sourceKey]).reduce((acc, key) => {
-            if (selectedLanguages.includes(key)) acc[key] = source[sourceKey][key];
-            return acc;
-          }, {});
-        } else if (!isNaN(Number(sourceKey))) {
-          // filtering base by selected languages
-          source[sourceKey] = Object.keys(source[sourceKey]).reduce((acc, key) => {
-            acc[key] = Object.keys(source[sourceKey][key]).reduce(
-              (accLn, keyLn) => {
-                if (selectedLanguages.includes(keyLn))
-                  accLn[keyLn] = source[sourceKey][key][keyLn];
-                return accLn;
-              },
-              {}
-            );
-            return acc;
-          }, {});
+        if (sourceKey === "base" || !isNaN(Number(sourceKey))) {
+          // filtering by selected languages
+          source[sourceKey] = Object.keys(source[sourceKey]).reduce(
+            (acc, key) => {
+              if (selectedLanguages.includes(key))
+                acc[key] = source[sourceKey][key];
+              return acc;
+            },
+            {}
+          );
         }
-      })
+      });
 
       const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
 
