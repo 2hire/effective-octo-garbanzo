@@ -148,26 +148,28 @@ const main = async () => {
       }
       const source = JSON.parse(file);
 
-      // filtering base by selected languages
-      source.base = Object.entries(source.base).reduce((acc, [key, value]) => {
-        if (selectedLanguages.includes(key)) acc[key] = source.base[key];
-        return acc;
-      }, {});
-
-      // filtering specific by selected languages
-      if (source.specific) {
-        source.specific = Object.keys(source.specific).reduce((acc, key) => {
-          acc[key] = Object.keys(source.specific[key]).reduce(
-            (accLn, keyLn) => {
-              if (selectedLanguages.includes(keyLn))
-                accLn[keyLn] = source.specific[key][keyLn];
-              return accLn;
-            },
-            {}
-          );
-          return acc;
-        }, {});
-      }
+      Object.keys(source).forEach((sourceKey) => {
+        if (sourceKey === 'base') {
+          // filtering base by selected languages
+          source[sourceKey] = Object.keys(source[sourceKey]).reduce((acc, key) => {
+            if (selectedLanguages.includes(key)) acc[key] = source[sourceKey][key];
+            return acc;
+          }, {});
+        } else if (!isNaN(Number(sourceKey))) {
+          // filtering base by selected languages
+          source[sourceKey] = Object.keys(source[sourceKey]).reduce((acc, key) => {
+            acc[key] = Object.keys(source[sourceKey][key]).reduce(
+              (accLn, keyLn) => {
+                if (selectedLanguages.includes(keyLn))
+                  accLn[keyLn] = source[sourceKey][key][keyLn];
+                return accLn;
+              },
+              {}
+            );
+            return acc;
+          }, {});
+        }
+      })
 
       const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
 
