@@ -158,77 +158,79 @@ const main = () => {
     const token = core.getInput("token");
     const appInfo = JSON.parse(core.getInput("app-info"));
 
-    // Read file from path
-    fs.readFile(path, "utf-8", (error, data) => {
-      if (error) {
-        return console.error(error);
-      }
-      const source = JSON.parse(data);
+    console.log("SECRETS:", appInfo);
 
-      appInfo.forEach(async (element) => {
-        try {
-          const branch = element.branchName;
-          const garbanzoBranch = branch.split("/")[0] + "-garbanzo";
+    // // Read file from path
+    // fs.readFile(path, "utf-8", (error, data) => {
+    //   if (error) {
+    //     return console.error(error);
+    //   }
+    //   const source = JSON.parse(data);
 
-          // Get json data
-          const responseData = await getRawJsonData(
-            owner,
-            repo,
-            branch,
-            path,
-            token
-          );
-          if (responseData.data) {
-            // Updates target keys
-            const [_, target] = Utils.updateKeys(source, responseData.data);
-            const responseBranchRef = await GitHubAPI.Branch.getRef(
-              owner,
-              repo,
-              branch,
-              token
-            );
-            if (responseBranchRef.data) {
-              const branchRefSHA = responseBranchRef.data.object.sha;
-              await GitHubAPI.Branch.create(
-                owner,
-                repo,
-                garbanzoBranch,
-                branchRefSHA,
-                token
-              );
-              const responseJsonFile = await GitHubAPI.Repository.getContents(
-                owner,
-                repo,
-                garbanzoBranch,
-                path,
-                token
-              );
-              if (responseJsonFile.data) {
-                const jsonFileSHA = responseJsonFile.data.sha;
-                await GitHubAPI.Repository.updateContents(
-                  owner,
-                  repo,
-                  garbanzoBranch,
-                  path,
-                  target,
-                  jsonFileSHA,
-                  token
-                );
-                await GitHubAPI.Pull.createRequest(
-                  owner,
-                  repo,
-                  garbanzoBranch,
-                  branch,
-                  token
-                );
-              }
-            }
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      });
-    });
+    //   appInfo.forEach(async (element) => {
+    //     try {
+    //       const branch = element.branchName;
+    //       const garbanzoBranch = branch.split("/")[0] + "-garbanzo";
+
+    //       // Get json data
+    //       const responseData = await getRawJsonData(
+    //         owner,
+    //         repo,
+    //         branch,
+    //         path,
+    //         token
+    //       );
+    //       if (responseData.data) {
+    //         // Updates target keys
+    //         const [_, target] = Utils.updateKeys(source, responseData.data);
+    //         const responseBranchRef = await GitHubAPI.Branch.getRef(
+    //           owner,
+    //           repo,
+    //           branch,
+    //           token
+    //         );
+    //         if (responseBranchRef.data) {
+    //           const branchRefSHA = responseBranchRef.data.object.sha;
+    //           await GitHubAPI.Branch.create(
+    //             owner,
+    //             repo,
+    //             garbanzoBranch,
+    //             branchRefSHA,
+    //             token
+    //           );
+    //           const responseJsonFile = await GitHubAPI.Repository.getContents(
+    //             owner,
+    //             repo,
+    //             garbanzoBranch,
+    //             path,
+    //             token
+    //           );
+    //           if (responseJsonFile.data) {
+    //             const jsonFileSHA = responseJsonFile.data.sha;
+    //             await GitHubAPI.Repository.updateContents(
+    //               owner,
+    //               repo,
+    //               garbanzoBranch,
+    //               path,
+    //               target,
+    //               jsonFileSHA,
+    //               token
+    //             );
+    //             await GitHubAPI.Pull.createRequest(
+    //               owner,
+    //               repo,
+    //               garbanzoBranch,
+    //               branch,
+    //               token
+    //             );
+    //           }
+    //         }
+    //       }
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    //   });
+    // });
   } catch (error) {
     core.setFailed(error.message);
   }
