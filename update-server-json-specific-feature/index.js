@@ -169,13 +169,13 @@ const main = async () => {
 
       const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
 
-      if (dryRun) console.log(diffToSend);
-      else 
-        Adapter.setServerTranslation(
-          diffToSend,
-          `${endpoint}`,
-          headers
-        );
+      console.log(diffToSend);
+      // 
+      //   Adapter.setServerTranslation(
+      //     diffToSend,
+      //     `${endpoint}`,
+      //     headers
+      //   );
     });
 
     fs.writeFile(backupFilePath, JSON.stringify(target), (err) => {
