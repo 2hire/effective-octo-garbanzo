@@ -150,17 +150,13 @@ const main = async () => {
       }
       const source = JSON.parse(file);
 
-      Object.keys(source).forEach((sourceKey) => {
+      Object.keys(k).forEach((sourceKey) => {
         if (sourceKey === "base" || !isNaN(Number(sourceKey))) {
-          // filtering by selected languages
-          source[sourceKey] = Object.keys(source[sourceKey]).reduce(
-            (acc, key) => {
-              if (selectedLanguages.includes(key))
-                acc[key] = source[sourceKey][key];
-              return acc;
-            },
-            {}
-          );
+          // filtering base by selected languages
+          k[sourceKey] = Object.keys(k[sourceKey]).reduce((acc, key) => {
+            if (selectedLanguages.includes(key)) acc[key] = k[sourceKey][key];
+            return acc;
+          }, {});
         }
       });
 
