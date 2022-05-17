@@ -153,24 +153,20 @@ const main = async () => {
       Object.keys(source).forEach((sourceKey) => {
         if (sourceKey === "base" || !isNaN(Number(sourceKey))) {
           // filtering base by selected languages
-          source[sourceKey] = Object.keys(source[sourceKey]).reduce((acc, key) => {
-            if (selectedLanguages.includes(key)) acc[key] = source[sourceKey][key];
-            return acc;
-          }, {});
+          source[sourceKey] = Object.keys(source[sourceKey]).reduce(
+            (acc, key) => {
+              if (selectedLanguages.includes(key))
+                acc[key] = source[sourceKey][key];
+              return acc;
+            },
+            {}
+          );
         }
       });
 
-      console.log(source);
-
       const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
 
-      console.log(diffToSend);
-      //
-      //   Adapter.setServerTranslation(
-      //     diffToSend,
-      //     `${endpoint}`,
-      //     headers
-      //   );
+      Adapter.setServerTranslation(diffToSend, `${endpoint}`, headers);
     });
 
     fs.writeFile(backupFilePath, JSON.stringify(target), (err) => {
