@@ -169,8 +169,7 @@ const main = () => {
       Object.entries(secrets).forEach(async ([key, value]) => {
         try {
           if (key.endsWith(secretSuffix)) {
-            console.log(value);
-            const branch = value.branchName;
+            const branch = JSON.parse(value).branchName;
             const garbanzoBranch = branch.split("/")[0] + "-garbanzo";
 
             // Get json data
