@@ -164,7 +164,6 @@ const main = () => {
       if (error) {
         return console.error(error);
       }
-      const source = JSON.parse(data);
 
       Object.entries(secrets).forEach(async ([key, value]) => {
         try {
@@ -181,6 +180,36 @@ const main = () => {
               token
             );
             if (responseData.data) {
+              const source = JSON.parse(data);
+
+              // filtering by selected languages
+              source.base = Object.entries(source.base).reduce(
+                (acc, [key, value]) => {
+                  if (selectedLanguages.includes(key))
+                    acc[key] = source.base[key];
+                  return acc;
+                },
+                {}
+              );
+
+              // filtering by selected languages
+              if (source.specific) {
+                source.specific = Object.keys(source.specific).reduce(
+                  (acc, key) => {
+                    acc[key] = Object.keys(source.specific[key]).reduce(
+                      (accLn, keyLn) => {
+                        if (selectedLanguages.includes(keyLn))
+                          accLn[keyLn] = source.specific[key][keyLn];
+                        return accLn;
+                      },
+                      {}
+                    );
+                    return acc;
+                  },
+                  {}
+                );
+              }
+
               // Updates target keys
               const [_, target] = Utils.updateKeys(source, responseData.data);
               const responseBranchRef = await GitHubAPI.Branch.getRef(

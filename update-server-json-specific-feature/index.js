@@ -147,11 +147,13 @@ const main = async () => {
       }
       const source = JSON.parse(file);
 
+      // filtering by selected languages
       source.base = Object.entries(source.base).reduce((acc, [key, value]) => {
         if (selectedLanguages.includes(key)) acc[key] = source.base[key];
         return acc;
       }, {});
 
+      // filtering by selected languages
       if (source.specific) {
         source.specific = Object.keys(source.specific).reduce((acc, key) => {
           acc[key] = Object.keys(source.specific[key]).reduce(
