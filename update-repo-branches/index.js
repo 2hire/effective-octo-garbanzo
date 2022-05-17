@@ -106,7 +106,7 @@ const GitHubAPI = {
           JSON.stringify({
             message: "feat: [Garbanzo] Updated target json",
             content: Buffer.from(
-              JSON.stringify(content, null, 2),
+              JSON.stringify(content, null, 2) + "\n",
               "utf-8"
             ).toString("base64"),
             sha,
