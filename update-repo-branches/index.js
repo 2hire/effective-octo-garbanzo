@@ -168,7 +168,8 @@ const main = () => {
       Object.entries(secrets).forEach(async ([key, value]) => {
         try {
           if (key.endsWith(secretSuffix)) {
-            const branch = JSON.parse(value).branchName;
+            const parsedValue = JSON.parse(value);
+            const branch = parsedValue.branchName;
             const garbanzoBranch = branch.split("/")[0] + "-garbanzo";
 
             // Get json data
@@ -181,6 +182,7 @@ const main = () => {
             );
             if (responseData.data) {
               const source = JSON.parse(data);
+              const selectedLanguages = parsedValue.selectedLanguages;
 
               // filtering by selected languages
               source.base = Object.entries(source.base).reduce(
