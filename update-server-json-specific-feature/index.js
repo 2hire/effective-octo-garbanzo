@@ -110,15 +110,19 @@ const diff = (source, target) => {
 
 const main = async () => {
   try {
+    const dryRun = core.getInput("dry-run");
     const endpoint = core.getInput("endpoint");
     const stringQueryParams = core.getInput("query-params");
     const path = core.getInput("file-path");
     const backupFilePath = core.getInput("backup-file-path");
     const currentBranchName = core.getInput("current-branch");
-    const appInfo = JSON.parse(core.getInput("app-info"));
+    const secrets = JSON.parse(core.getInput("secrets-context"));
+    const secretSuffix = core.getInput("secret-suffix");
 
-    const thisBranch = appInfo.find(
-      (branch) => branch.branchName === currentBranchName
+    const thisBranch = Object.entries(secrets).find(
+      ([key, value]) =>
+        key.endsWith(secretSuffix) &&
+        JSON.parse(value).branchName === currentBranchName
     );
 
     // If branch not found: exit
@@ -126,6 +130,7 @@ const main = async () => {
 
     const serviceToken = thisBranch.serviceToken;
     const bearerToken = thisBranch.bearerToken;
+    const selectedLanguages = thisBranch.selectedLanguages;
 
     const headers = {
       Authorization: `Bearer ${bearerToken}`,
@@ -141,8 +146,30 @@ const main = async () => {
         return console.error(error);
       }
       const source = JSON.parse(file);
+
+      source.base = Object.entries(source.base).reduce((acc, [key, value]) => {
+        if (selectedLanguages.includes(key)) acc[key] = source.base[key];
+        return acc;
+      }, {});
+
+      if (source.specific) {
+        source.specific = Object.keys(source.specific).reduce((acc, key) => {
+          acc[key] = Object.keys(source.specific[key]).reduce(
+            (accLn, keyLn) => {
+              if (selectedLanguages.includes(keyLn))
+                accLn[keyLn] = source.specific[key][keyLn];
+              return accLn;
+            },
+            {}
+          );
+          return acc;
+        }, {});
+      }
+
       const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
-      if (stringQueryParams)
+
+      if (dryRun) console.log(diffToSend);
+      else if (stringQueryParams)
         Adapter.setServerTranslation(
           diffToSend,
           `${endpoint}?${stringQueryParams}`,

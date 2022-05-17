@@ -1,6 +1,9 @@
 name: 'Updates server file (specific feature)'
 description: 'Updates server file with recently added json keys'
 inputs:
+  dry-run:
+    description: 'If true don't upload to the server'
+    required: true
   endpoint:
     description: 'Endpoint'
     required: true
@@ -16,8 +19,11 @@ inputs:
   current-branch:
     description: 'Branch name'
     required: true
-  app-info:
-    description: 'Apps list'
+  secrets-context:
+    description: 'Secrets context'
+    required: true
+  secret-suffix:
+    description: 'Secret suffix to identify the one that will be used'
     required: true
     
 runs:
