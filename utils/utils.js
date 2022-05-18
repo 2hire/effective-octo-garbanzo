@@ -7,11 +7,11 @@ module.exports = {
    * @returns the diff object
    */
   diff: function (source, target) {
-    if (isObject(source))
+    if (this.isObject(source))
       return Object.keys(source).reduce((acc, key) => {
         if (!target.hasOwnProperty(key)) acc[key] = source[key];
         else {
-          const result = diff(source[key], target[key]);
+          const result = this.diff(source[key], target[key]);
           if (result && Object.keys(result).length > 0) {
             acc[key] = result;
           }
@@ -49,12 +49,12 @@ module.exports = {
    * @returns the source and the target with the updated keys
    */
   updateKeys: function (source, target) {
-    if (isObject(source)) {
+    if (this.isObject(source)) {
       const sourceKeys = Object.keys(source);
       sourceKeys.forEach((key) => {
         if (!target.hasOwnProperty(key)) target[key] = source[key];
         else {
-          Utils.updateKeys(source[key], target[key]);
+          this.updateKeys(source[key], target[key]);
         }
       });
     }
