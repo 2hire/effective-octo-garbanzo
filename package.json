@@ -23,5 +23,5 @@
     "axios": "^0.26.1",
     "fs": "^0.0.1-security"
   },
-  "type": "module"
+  "type": "commonjs"
 }

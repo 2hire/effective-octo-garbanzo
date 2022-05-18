@@ -3,8 +3,8 @@ const axios = require("axios");
 const fs = require("fs");
 
 // utils
-const { ErrorMessage } = require("../utils/constants");
-const { filterLanguages, diff, isObject, isString } = require("../utils/utils");
+const Constants = require("../utils/constants");
+const Utils = require("../utils/utils");
 
 const Adapter = {
   getServerTranslation: async (endpoint, headers) => {
@@ -45,7 +45,7 @@ const TranslationHelper = {
     }
 
     const mapLanguageObject = (original) => {
-      if (isObject(original))
+      if (Utils.isObject(original))
         return Object.entries(original).reduce((acc, [key, value]) => {
           acc[key] = value.reduce((acc, keyValueObject) => {
             acc[keyValueObject.key] = keyValueObject.value;
@@ -66,7 +66,7 @@ const TranslationHelper = {
 
   toKeyValue: (namedKey) => {
     const mapLanguageObject = (original) => {
-      if (isObject(original))
+      if (Utils.isObject(original))
         return Object.entries(original).reduce((acc, [key, value]) => {
           acc[key] = Object.entries(value).map(
             ([translationKey, translationValue]) => {
@@ -111,8 +111,8 @@ const main = async () => {
     const thisBranch = JSON.parse(thisBranchUnparsed);
 
     // Check if secret is an object, else return
-    if (!isObject(thisBranch)) {
-      console.error(ErrorMessage.NOT_AN_OBJECT);
+    if (!Utils.isObject(thisBranch)) {
+      console.error(Constants.ErrorMessage.NOT_AN_OBJECT);
       return;
     }
 
@@ -122,11 +122,11 @@ const main = async () => {
 
     // type checking
     if (
-      !isString(serviceToken) ||
-      !isString(bearerToken) ||
+      !Utils.isString(serviceToken) ||
+      !Utils.isString(bearerToken) ||
       !Array.isArray(selectedLanguages)
     ) {
-      console.error(ErrorMessage.INCOMPATIBLE_PROPERTIES);
+      console.error(Constants.ErrorMessage.INCOMPATIBLE_PROPERTIES);
       return;
     }
 
@@ -151,10 +151,10 @@ const main = async () => {
       const source = JSON.parse(file);
 
       // filtering by selected languages
-      filterLanguages(source, selectedLanguages);
+      Utils.filterLanguages(source, selectedLanguages);
 
       // calculate diff between current translations and server translations to send to the server
-      const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
+      const diffToSend = TranslationHelper.toKeyValue(Utils.diff(source, target));
 
       Adapter.setServerTranslation(diffToSend, `${endpoint}`, headers);
     });

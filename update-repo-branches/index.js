@@ -3,13 +3,8 @@ const axios = require("axios");
 const fs = require("fs");
 
 // utils
-const { ErrorMessage } = require("../utils/constants");
-const {
-  filterLanguages,
-  updateKeys,
-  isString,
-  isObject,
-} = require("../utils/utils");
+const Constants = require("../utils/constants");
+const Utils = require("../utils/utils");
 
 const getRawJsonData = async (owner, repo, branchName, path, token) => {
   try {
@@ -162,8 +157,8 @@ const main = () => {
           const parsedValue = JSON.parse(value);
 
           // Check if secret is an object, else return
-          if (!isObject(parsedValue)) {
-            console.error(ErrorMessage.NOT_AN_OBJECT);
+          if (!Utils.isObject(parsedValue)) {
+            console.error(Constants.ErrorMessage.NOT_AN_OBJECT);
             return;
           }
 
@@ -171,8 +166,8 @@ const main = () => {
           const selectedLanguages = parsedValue.selectedLanguages;
 
           // type checking
-          if (!isString(branch) || !Array.isArray(selectedLanguages)) {
-            console.error(ErrorMessage.INCOMPATIBLE_PROPERTIES);
+          if (!Utils.isString(branch) || !Array.isArray(selectedLanguages)) {
+            console.error(Constants.ErrorMessage.INCOMPATIBLE_PROPERTIES);
             return;
           }
 
@@ -195,10 +190,10 @@ const main = () => {
             }
 
             // filtering by selected languages
-            filterLanguages(source, selectedLanguages);
+            Utils.filterLanguages(source, selectedLanguages);
 
             // Updates target keys
-            const [_, target] = updateKeys(source, responseData.data);
+            const [_, target] = Utils.updateKeys(source, responseData.data);
             const responseBranchRef = await GitHubAPI.Branch.getRef(
               owner,
               repo,
