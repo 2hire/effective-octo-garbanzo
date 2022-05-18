@@ -171,7 +171,7 @@ const main = () => {
             return;
           }
 
-          const garbanzoBranch = branch.split("/")[0] + "-garbanzo";
+          const garbanzoBranch = branch.split("/")[0] + "/garbanzo";
 
           // Get json data
           const responseData = await getRawJsonData(
