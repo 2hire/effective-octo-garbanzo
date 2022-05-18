@@ -177,7 +177,7 @@ const main = () => {
             !Array.isArray(parsedValue) &&
             typeof parsedValue === "object"
           ) {
-            console.log("Secret is not an object. Skipping...");
+            console.log(parsedValue, "Secret is not an object. Skipping...");
             return;
           }
 
