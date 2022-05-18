@@ -128,9 +128,28 @@ const main = async () => {
 
     const thisBranch = JSON.parse(thisBranchUnparsed);
 
+    // Check if secret is an object, else return
+    if (
+      thisBranch &&
+      !Array.isArray(thisBranch) &&
+      typeof thisBranch === "object"
+    ) {
+      console.log("Secret is not an object. Skipping...");
+      return;
+    }
+
     const serviceToken = thisBranch.serviceToken;
     const bearerToken = thisBranch.bearerToken;
     const selectedLanguages = thisBranch.selectedLanguages;
+
+    // type checking
+    if (
+      (!typeof serviceToken === "string" && !serviceToken instanceof String) ||
+      (!typeof bearerToken === "string" && !bearerToken instanceof String) ||
+      !Array.isArray(selectedLanguages)
+    ) {
+      return;
+    }
 
     const headers = {
       Authorization: `Bearer ${bearerToken}`,

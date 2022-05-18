@@ -167,77 +167,106 @@ const main = () => {
 
       Object.entries(secrets).forEach(async ([key, value]) => {
         try {
-          if (key.endsWith(secretSuffix)) {
-            const parsedValue = JSON.parse(value);
-            const branch = parsedValue.branchName;
-            const garbanzoBranch = branch.split("/")[0] + "-garbanzo";
+          // Not a secret we are interested in, skip
+          if (!key.endsWith(secretSuffix)) return;
+          const parsedValue = JSON.parse(value);
 
-            // Get json data
-            const responseData = await getRawJsonData(
+          // Check if secret is an object, else return
+          if (
+            parsedValue &&
+            !Array.isArray(parsedValue) &&
+            typeof parsedValue === "object"
+          ) {
+            console.log("Secret is not an object. Skipping...");
+            return;
+          }
+
+          const branch = parsedValue.branchName;
+          const selectedLanguages = parsedValue.selectedLanguages;
+
+          // type checking
+          if (
+            (!typeof branch === "string" && !branch instanceof String) ||
+            !Array.isArray(selectedLanguages)
+          ) {
+            console.log("Secret has incompatible properties. Skipping...");
+            return;
+          }
+
+          const garbanzoBranch = branch.split("/")[0] + "-garbanzo";
+
+          // Get json data
+          const responseData = await getRawJsonData(
+            owner,
+            repo,
+            branch,
+            path,
+            token
+          );
+          if (responseData.data) {
+            const source = JSON.parse(data);
+
+            // not an array, return
+            if (!Array.isArray(selectedLanguages)) {
+              return;
+            }
+
+            // filtering by selected languages
+            Object.keys(source).forEach((sourceKey) => {
+              if (sourceKey === "base" || !isNaN(Number(sourceKey))) {
+                source[sourceKey] = Object.keys(source[sourceKey]).reduce(
+                  (acc, key) => {
+                    if (selectedLanguages.includes(key))
+                      acc[key] = source[sourceKey][key];
+                    return acc;
+                  },
+                  {}
+                );
+              }
+            });
+
+            // Updates target keys
+            const [_, target] = Utils.updateKeys(source, responseData.data);
+            const responseBranchRef = await GitHubAPI.Branch.getRef(
               owner,
               repo,
               branch,
-              path,
               token
             );
-            if (responseData.data) {
-              const source = JSON.parse(data);
-              const selectedLanguages = parsedValue.selectedLanguages;
-
-              // filtering by selected languages
-              Object.keys(source).forEach((sourceKey) => {
-                if (sourceKey === "base" || !isNaN(Number(sourceKey))) {
-                  // filtering base by selected languages
-                  source[sourceKey] = Object.keys(source[sourceKey]).reduce((acc, key) => {
-                    if (selectedLanguages.includes(key)) acc[key] = source[sourceKey][key];
-                    return acc;
-                  }, {});
-                }
-              });
-
-              // Updates target keys
-              const [_, target] = Utils.updateKeys(source, responseData.data);
-              const responseBranchRef = await GitHubAPI.Branch.getRef(
+            if (responseBranchRef.data) {
+              const branchRefSHA = responseBranchRef.data.object.sha;
+              await GitHubAPI.Branch.create(
                 owner,
                 repo,
-                branch,
+                garbanzoBranch,
+                branchRefSHA,
                 token
               );
-              if (responseBranchRef.data) {
-                const branchRefSHA = responseBranchRef.data.object.sha;
-                await GitHubAPI.Branch.create(
-                  owner,
-                  repo,
-                  garbanzoBranch,
-                  branchRefSHA,
-                  token
-                );
-                const responseJsonFile = await GitHubAPI.Repository.getContents(
+              const responseJsonFile = await GitHubAPI.Repository.getContents(
+                owner,
+                repo,
+                garbanzoBranch,
+                path,
+                token
+              );
+              if (responseJsonFile.data) {
+                const jsonFileSHA = responseJsonFile.data.sha;
+                await GitHubAPI.Repository.updateContents(
                   owner,
                   repo,
                   garbanzoBranch,
                   path,
+                  target,
+                  jsonFileSHA,
                   token
                 );
-                if (responseJsonFile.data) {
-                  const jsonFileSHA = responseJsonFile.data.sha;
-                  await GitHubAPI.Repository.updateContents(
-                    owner,
-                    repo,
-                    garbanzoBranch,
-                    path,
-                    target,
-                    jsonFileSHA,
-                    token
-                  );
-                  await GitHubAPI.Pull.createRequest(
-                    owner,
-                    repo,
-                    garbanzoBranch,
-                    branch,
-                    token
-                  );
-                }
+                await GitHubAPI.Pull.createRequest(
+                  owner,
+                  repo,
+                  garbanzoBranch,
+                  branch,
+                  token
+                );
               }
             }
           }
