@@ -130,9 +130,11 @@ const main = async () => {
 
     // Check if secret is an object, else return
     if (
-      thisBranch &&
-      !Array.isArray(thisBranch) &&
-      typeof thisBranch === "object"
+      !(
+        thisBranch &&
+        !Array.isArray(thisBranch) &&
+        typeof thisBranch === "object"
+      )
     ) {
       console.log("Secret is not an object. Skipping...");
       return;

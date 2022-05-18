@@ -173,11 +173,13 @@ const main = () => {
 
           // Check if secret is an object, else return
           if (
-            parsedValue &&
-            !Array.isArray(parsedValue) &&
-            typeof parsedValue === "object"
+            !(
+              parsedValue &&
+              !Array.isArray(parsedValue) &&
+              typeof parsedValue === "object"
+            )
           ) {
-            console.log(parsedValue, "Secret is not an object. Skipping...");
+            console.log("Secret is not an object. Skipping...");
             return;
           }
 
