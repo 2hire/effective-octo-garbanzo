@@ -2,6 +2,15 @@ const core = require("@actions/core");
 const axios = require("axios");
 const fs = require("fs");
 
+// utils
+const { ErrorMessage } = require("../utils/constants");
+const {
+  filterLanguages,
+  updateKeys,
+  isString,
+  isObject,
+} = require("../utils/utils");
+
 const getRawJsonData = async (owner, repo, branchName, path, token) => {
   try {
     return await axios.get(
@@ -15,26 +24,6 @@ const getRawJsonData = async (owner, repo, branchName, path, token) => {
   } catch (error) {
     console.error(error);
   }
-};
-
-const Utils = {
-  updateKeys: (source, target) => {
-    if (
-      typeof source === "object" &&
-      !Array.isArray(source) &&
-      source !== null
-    ) {
-      const sourceKeys = Object.keys(source);
-      sourceKeys.forEach((key) => {
-        if (!target.hasOwnProperty(key)) target[key] = source[key];
-        else {
-          Utils.updateKeys(source[key], target[key]);
-        }
-      });
-    }
-
-    return [source, target];
-  },
 };
 
 const GitHubAPI = {
@@ -165,6 +154,7 @@ const main = () => {
         return console.error(error);
       }
 
+      // Iterate for each secret
       Object.entries(secrets).forEach(async ([key, value]) => {
         try {
           // Not a secret we are interested in, skip
@@ -172,14 +162,8 @@ const main = () => {
           const parsedValue = JSON.parse(value);
 
           // Check if secret is an object, else return
-          if (
-            !(
-              parsedValue &&
-              !Array.isArray(parsedValue) &&
-              typeof parsedValue === "object"
-            )
-          ) {
-            console.log("Secret is not an object. Skipping...");
+          if (!isObject(parsedValue)) {
+            console.error(ErrorMessage.NOT_AN_OBJECT);
             return;
           }
 
@@ -187,11 +171,8 @@ const main = () => {
           const selectedLanguages = parsedValue.selectedLanguages;
 
           // type checking
-          if (
-            (!typeof branch === "string" && !branch instanceof String) ||
-            !Array.isArray(selectedLanguages)
-          ) {
-            console.log("Secret has incompatible properties. Skipping...");
+          if (!isString(branch) || !Array.isArray(selectedLanguages)) {
+            console.error(ErrorMessage.INCOMPATIBLE_PROPERTIES);
             return;
           }
 
@@ -214,21 +195,10 @@ const main = () => {
             }
 
             // filtering by selected languages
-            Object.keys(source).forEach((sourceKey) => {
-              if (sourceKey === "base" || !isNaN(Number(sourceKey))) {
-                source[sourceKey] = Object.keys(source[sourceKey]).reduce(
-                  (acc, key) => {
-                    if (selectedLanguages.includes(key))
-                      acc[key] = source[sourceKey][key];
-                    return acc;
-                  },
-                  {}
-                );
-              }
-            });
+            filterLanguages(source, selectedLanguages);
 
             // Updates target keys
-            const [_, target] = Utils.updateKeys(source, responseData.data);
+            const [_, target] = updateKeys(source, responseData.data);
             const responseBranchRef = await GitHubAPI.Branch.getRef(
               owner,
               repo,

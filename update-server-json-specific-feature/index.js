@@ -2,6 +2,10 @@ const core = require("@actions/core");
 const axios = require("axios");
 const fs = require("fs");
 
+// utils
+const { ErrorMessage } = require("../utils/constants");
+const { filterLanguages, diff, isObject, isString } = require("../utils/utils");
+
 const Adapter = {
   getServerTranslation: async (endpoint, headers) => {
     try {
@@ -41,11 +45,7 @@ const TranslationHelper = {
     }
 
     const mapLanguageObject = (original) => {
-      if (
-        typeof original === "object" &&
-        !Array.isArray(original) &&
-        original !== null
-      )
+      if (isObject(original))
         return Object.entries(original).reduce((acc, [key, value]) => {
           acc[key] = value.reduce((acc, keyValueObject) => {
             acc[keyValueObject.key] = keyValueObject.value;
@@ -66,11 +66,7 @@ const TranslationHelper = {
 
   toKeyValue: (namedKey) => {
     const mapLanguageObject = (original) => {
-      if (
-        typeof original === "object" &&
-        !Array.isArray(original) &&
-        original !== null
-      )
+      if (isObject(original))
         return Object.entries(original).reduce((acc, [key, value]) => {
           acc[key] = Object.entries(value).map(
             ([translationKey, translationValue]) => {
@@ -94,20 +90,6 @@ const TranslationHelper = {
   },
 };
 
-const diff = (source, target) => {
-  if (typeof source === "object" && !Array.isArray(source) && source !== null)
-    return Object.keys(source).reduce((acc, key) => {
-      if (!target.hasOwnProperty(key)) acc[key] = source[key];
-      else {
-        const result = diff(source[key], target[key]);
-        if (result && Object.keys(result).length > 0) {
-          acc[key] = result;
-        }
-      }
-      return acc;
-    }, {});
-};
-
 const main = async () => {
   try {
     const endpoint = core.getInput("endpoint");
@@ -129,14 +111,8 @@ const main = async () => {
     const thisBranch = JSON.parse(thisBranchUnparsed);
 
     // Check if secret is an object, else return
-    if (
-      !(
-        thisBranch &&
-        !Array.isArray(thisBranch) &&
-        typeof thisBranch === "object"
-      )
-    ) {
-      console.log("Secret is not an object. Skipping...");
+    if (!isObject(thisBranch)) {
+      console.error(ErrorMessage.NOT_AN_OBJECT);
       return;
     }
 
@@ -146,10 +122,11 @@ const main = async () => {
 
     // type checking
     if (
-      (!typeof serviceToken === "string" && !serviceToken instanceof String) ||
-      (!typeof bearerToken === "string" && !bearerToken instanceof String) ||
+      !isString(serviceToken) ||
+      !isString(bearerToken) ||
       !Array.isArray(selectedLanguages)
     ) {
+      console.error(ErrorMessage.INCOMPATIBLE_PROPERTIES);
       return;
     }
 
@@ -159,37 +136,30 @@ const main = async () => {
       "X-SERVICE-TOKEN": serviceToken,
     };
 
+    // get server translations
     const response = await Adapter.getServerTranslation(
       endpoint.split("?")[0],
       headers
     );
     const target = TranslationHelper.toNamedKey(response.data.data);
 
+    // reads translation file from input
     fs.readFile(path, "utf-8", (error, file) => {
       if (error) {
         return console.error(error);
       }
       const source = JSON.parse(file);
 
-      Object.keys(source).forEach((sourceKey) => {
-        if (sourceKey === "base" || !isNaN(Number(sourceKey))) {
-          // filtering base by selected languages
-          source[sourceKey] = Object.keys(source[sourceKey]).reduce(
-            (acc, key) => {
-              if (selectedLanguages.includes(key))
-                acc[key] = source[sourceKey][key];
-              return acc;
-            },
-            {}
-          );
-        }
-      });
+      // filtering by selected languages
+      filterLanguages(source, selectedLanguages);
 
+      // calculate diff between current translations and server translations to send to the server
       const diffToSend = TranslationHelper.toKeyValue(diff(source, target));
 
       Adapter.setServerTranslation(diffToSend, `${endpoint}`, headers);
     });
 
+    // Save server translations
     fs.writeFile(backupFilePath, JSON.stringify(target), (err) => {
       if (err) console.error(err);
     });
